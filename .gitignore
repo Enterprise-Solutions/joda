@@ -1,0 +1,17 @@
+# Ignore Play! working directory #
+.idea/
+.settings/
+logs/
+project/target/
+project/project/
+target/
+.cache-tests
+
+#Ignore folders generate by NPM
+dist/
+node_modules/
+typings/
+/bin/
+
+#Ignore Visual Studio files
+.vscode/
