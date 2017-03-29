@@ -4,6 +4,7 @@ import scala.util.Success
 import scala.util.Failure
 import java.util.Date
 
+
 case class Usuario(
   id: Long,
   email: String,
@@ -15,14 +16,35 @@ case class Usuario(
     val Nombre = nombre.toUpperCase()
     s" $Nombre ${apellido.toUpperCase()}"
   }
+
+
+
+
 }
+
+
+
 
 case class Marcacion(
   id: Long,
   usuario_id: Long,
   fecha: Date,
-  lugar: String
-)
+  lugar: String,
+  fechaentrada: Date,
+  fechasalida: Date
+){
+  def _diferencia={
+
+  val Entrada = fechaentrada
+  val Salida = fechasalida 
+  var Diferencia = (Entrada.getTime() - Salida.getTime())*24
+  } 
+  
+  
+}
+
+
+
 
 object Marcaciones{
   var usuarios: Seq[Usuario] = Seq[Usuario](
@@ -67,9 +89,20 @@ object Marcaciones{
     usuarios = usuarios.:+(u1)
     Success(u1)
   }
+  
+  
+   
+  
+  
+  
   /**
    * dd-m-yyyy hh:mm:ss
    */
   def _agregarMarcacionExterna(email: String) = ???
+  
+  
+  
 }
 
+ 
+  
