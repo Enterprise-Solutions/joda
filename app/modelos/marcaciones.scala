@@ -20,7 +20,8 @@ case class Usuario(
 case class Marcacion(
   id: Long,
   usuario_id: Long,
-  fecha: Date
+  fecha: Date,
+  lugar: String
 )
 
 object Marcaciones{
