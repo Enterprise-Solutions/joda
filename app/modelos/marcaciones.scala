@@ -10,17 +10,33 @@ case class Usuario(
   apellido: String,
   nombre: String,
   password: String
+  //marcaciones: Seq[Marcacion] = Seq[Marcacion]()
 ){
   def nombre_completo = {
     val Nombre = nombre.toUpperCase()
     s" $Nombre ${apellido.toUpperCase()}"
   }
+  
+  def _toDatosUsuario = {
+    DatosUsuario(email)
+  }
 }
+
+case class DatosUsuario(
+  correo: String    
+)
 
 case class Marcacion(
   id: Long,
   usuario_id: Long,
   fecha: Date
+)
+
+case class DatosCrearUsuario(
+  email: String,
+  apellido: String,
+  nombre: String,
+  password: String    
 )
 
 object Marcaciones{
@@ -30,11 +46,21 @@ object Marcaciones{
   )
   var marcaciones: Seq[Marcacion] = Seq[Marcacion]()
   
+  def findUsuarios(email: Option[String],nombre: Option[String]) = {
+    val u1 = email.map { e =>
+      usuarios.filter { _.email == e }
+    }.getOrElse(usuarios)
+    val u2 = nombre.map{ n =>
+      u1.filter{_.nombre == n}
+    }.getOrElse(u1)
+    u2
+  }
   
-  def findUsuario(email: String): Try[Usuario] = {
+  
+  def findUsuario(email: String): Try[DatosUsuario] = {
     usuarios.filter{usuario => usuario.email == email}.
              headOption.map{ u => 
-      Success(u)
+      Success(u._toDatosUsuario)
     }.getOrElse(Failure(new Exception(s"No existe el usuario con email: $email")))
   }
   
