@@ -10,6 +10,8 @@ import modelos.Marcacion
 import modelos.DatosUsuario
 import modelos.DatosCrearUsuario*/
 import play.api.libs.json.JsError
+import scala.util.Success
+import scala.util.Failure
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -30,16 +32,10 @@ class UsuariosController @Inject() extends Controller {
    * a path of `/`.
    */
   def get(email: String,nombre: String) = Action { request => 
-    //Ok(views.html.index("Your new application is ready."))
-    val r = Marcaciones.findUsuario(email)
-    
-    if(r.isSuccess){
-      val u = r.get
-      Ok(Json.toJson(u))
+    Marcaciones.findUsuario(email) match{
+      case Success(u) => Ok(Json.toJson(u))
+      case Failure(e) => BadRequest(e.getMessage) 
     }
-    else
-      BadRequest(s"No existe el usuario :$email!")
-    
   }
    
   def crearUsuario() = Action(BodyParsers.parse.json) { request =>
@@ -49,12 +45,10 @@ class UsuariosController @Inject() extends Controller {
          BadRequest(Json.obj("status" ->"Error", "message" -> JsError.toJson(errores)))
         },
         d => { 
-          val r = Marcaciones.agregarUsuario(d.email, d.apellido, d.nombre, d.password)
-          if(r.isSuccess){
-            Ok(Json.toJson(r.get))
+          Marcaciones.agregarUsuario(d.email, d.apellido, d.nombre, d.password) match{
+            case Success(u) => Ok(Json.toJson(u))
+            case Failure(e) => BadRequest(e.getMessage)  
           }
-          else
-            BadRequest("No se pudo crear el usuario!")
         }
     )
   } 
