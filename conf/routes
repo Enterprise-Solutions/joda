@@ -9,5 +9,16 @@ GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 
+
+GET		/usuarios/email/:email/nombre/:nombre		    controllers.UsuariosController.get(email:String,nombre: String)
+
+POST	/usuarios					controllers.UsuariosController.crearUsuario()
+
+POST	/marcacion					controllers.MarcacionesController.crearMarcacion()
+
+GET		/marcacion/email/:email			controllers.MarcacionesController.getMarcacionesUsuario(email)
+
+GET 	/marcacion/fecha/:fecha			controllers.MarcacionesController.getMarcacionesFecha(fecha)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
