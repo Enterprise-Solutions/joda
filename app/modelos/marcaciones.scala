@@ -8,23 +8,7 @@ import java.text.SimpleDateFormat
 import java.util._
 import org.joda.time.DateTime // importando la clase DateTime de JodA.
 
-case class Usuario(
-  id: Long,
-  email: String,
-  apellido: String,
-  nombre: String,
-  password: String
-  //marcaciones: Seq[Marcacion] = Seq[Marcacion]()
-){
-  def nombre_completo = {
-    val Nombre = nombre.toUpperCase()
-    s" $Nombre ${apellido.toUpperCase()}"
-  }
-  
-  def _toDatosUsuario = {
-    DatosUsuario(email)
-  }
-}
+
 
 case class DatosUsuario(
   correo: String    
