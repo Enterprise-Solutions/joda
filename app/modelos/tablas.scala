@@ -54,3 +54,12 @@ case class MarcacionV1(
   fecha: Timestamp
 )
 
+class MarcacionT(tag: Tag) extends Table[MarcacionV1](tag,"marcaciones"){
+  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
+  def usuario_id = column[Long]("usuario_id")
+  def lugar_id    = column[Long]("lugar_id")
+  def fecha   = column[Timestamp]("fecha")
+  
+  def * = (id,usuario_id,lugar_id, fecha) <> (MarcacionV1.tupled,MarcacionV1.unapply)
+}
+
