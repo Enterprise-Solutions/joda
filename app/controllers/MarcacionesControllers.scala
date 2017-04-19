@@ -22,6 +22,7 @@ import java.sql.Timestamp
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import services.DatosDeMarcacion
+import services.DatosCrearMarcacion
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -32,7 +33,7 @@ class MarcacionesController @Inject() (marcaciones: Marcaciones, implicit val ec
  //  implicit val marcacionJsonFormatter = Json.format[Marcacion]
  //  implicit val usuarioJsonFormatter = Json.format[Usuario]
    implicit val marcacionesJsonFormatter = Json.format[DatosDeMarcacion]
- //  implicit val datosUsuarioJsonFormatter1 = Json.format[DatosUsuario]
+   implicit val datosCrearMarcacionJsonFormatter1 = Json.format[DatosCrearMarcacion]
  //  implicit val datosCrearUsuarioFormatter = Json.format[DatosCrearUsuario]
    
    
@@ -45,33 +46,20 @@ class MarcacionesController @Inject() (marcaciones: Marcaciones, implicit val ec
     }
    }
    
-  
-/*  
-  def borrar(email: String) = Action.async{request => 
-    usuarios.borrar(email) map{ r =>
-      Ok(r)
-    }recover {
-            case e: Exception => BadRequest(e.getMessage)
-          }
-  }
    
-  def crearUsuario() = Action.async(BodyParsers.parse.json) { request =>
-    val jsonResult = request.body.validate[DatosCrearUsuario]
+  def crearMarcacion() = Action.async(BodyParsers.parse.json) { request =>
+    val jsonResult = request.body.validate[DatosCrearMarcacion]
     jsonResult.fold(
         errores => {
          Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> JsError.toJson(errores))))
         },
         d => { 
-          /*Marcaciones.agregarUsuario(d.email, d.apellido, d.nombre, d.password) match{
-            case Success(u) => Ok(Json.toJson(u))
-            case Failure(e) => BadRequest(e.getMessage)  
-          }*/
-          usuarios.crear(d) map{ u =>
+          marcaciones.crear(d) map{ u =>
             Ok(Json.toJson(u))
           }recover {
             case e: Exception => BadRequest(e.getMessage)
           }
         }
     )
-  } */
+  } 
 }

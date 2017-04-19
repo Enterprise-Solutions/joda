@@ -6,9 +6,13 @@ import scala.concurrent.{ExecutionContext,Future}
 import slick.driver.PostgresDriver
 import modelos.UsuarioT
 import modelos.MarcacionT
+import modelos.LugarT
 import modelos.Usuario
+import modelos.Lugar
 import modelos.MarcacionV1
 import modelos.DatosCrearUsuario
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
 
 case class DatosDeMarcacion(
   id: Long,
@@ -17,9 +21,23 @@ case class DatosDeMarcacion(
   fecha: String  
 )
 
+case class DatosCrearMarcacion(
+  email: String,
+  lugar: String,
+  fecha: String
+)
+
+case class DatosCrearMarcacion2(
+  usuario_id: Long,
+  lugar_id: Long,
+  fecha: Timestamp
+)
+
 class Marcaciones @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
   val marcaciones = TableQuery[MarcacionT]
+  val usuarios = TableQuery[UsuarioT]
+  val lugares = TableQuery[LugarT]
   
   def listado(usuario_id:Option[Long],lugar_id: Option[Long]): Future[Seq[DatosDeMarcacion]] = {
     db.run(_action(usuario_id,lugar_id))
@@ -46,63 +64,53 @@ class Marcaciones @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
       }}
     }yield(r1)
   }
-  /*
-  def crear(d: DatosCrearUsuario): Future[Usuario] = {
-    db.run(crearUsuario(d).transactionally)
+  
+  def crear(d: DatosCrearMarcacion): Future[DatosDeMarcacion] = {
+    db.run(crearMarcacion(d).transactionally)
   }
-  
-  def borrar(email: String):Future[String] = {
-    db.run(
-        borrarUsuario(email).transactionally
-    )
-  }
-  
-  
   
   def _findUsuario(email: String): DBIO[Option[Usuario]] = {
     usuarios.filter(_.email === email).result.headOption
   }
   
-  def crearUsuario(d: DatosCrearUsuario): DBIO[Usuario] = {
+  def _findLugar(nombre: String): DBIO[Option[Lugar]] = {
+    lugares.filter(_.nombre === nombre).result.headOption
+  }
+  
+  def crearMarcacion(d: DatosCrearMarcacion): DBIO[DatosDeMarcacion] = {
+    
+    val formatOfDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	   
     for{
       uOp <- _findUsuario(d.email)
       _   <- uOp match{
-        case Some(u) => DBIO.failed(new Exception(s"Ya existe usuario con email: ${d.email}"))
-        case None    => DBIO.successful("")
+        case None => DBIO.failed(new Exception(s"No existe usuario con email: ${d.email}. Crear primero el usuario"))
+        case Some(u)    => DBIO.successful("")
       }
-      u   <- _crearUsuario(d)
-    }yield(u)
+      lOp <- _findLugar(d.lugar)
+      _   <- lOp match{
+        case None => DBIO.failed(new Exception(s"No existe lugar con nombre: ${d.lugar}. Crear primero el lugar"))
+        case Some(u)    => DBIO.successful("")
+      }
+      m   <- _crearMarcacion(DatosCrearMarcacion2(uOp.get.id, lOp.get.id, Timestamp.valueOf(d.fecha)))
+    }yield(m)
   }
   
-  def _crearUsuario(d: DatosCrearUsuario): DBIO[Usuario] = {
-    val u = Usuario(0,d.email,d.apellido,d.nombre,d.password)
+  def _crearMarcacion(d: DatosCrearMarcacion2): DBIO[DatosDeMarcacion] = {
+    val m = MarcacionV1(0,d.usuario_id,d.lugar_id,d.fecha)
     for{
-      new_id <- usuarios returning usuarios.map(_.id) += u
+      new_id <- marcaciones returning marcaciones.map(_.id) += m
       u1  <- new_id match{
-        case n if(n > 0) => DBIO.successful(u.copy(id = new_id))
-        case _ => DBIO.failed(new Exception(s"No se pudo insertar el usuario"))
+        case n if(n > 0) => DBIO.successful(m.copy(id = new_id))
+        case _ => DBIO.failed(new Exception(s"No se pudo insertar la marcacion"))
       }
-    }yield(u1)
+      m1 <- DBIO.successful{
+        DatosDeMarcacion(
+          new_id,
+          m.usuario_id,
+          m.lugar_id,
+          m.fecha.toString
+        )}
+    }yield(m1)
   }
-  
-  def borrarUsuario(email: String) = {
-    for{
-      uOp <- _findUsuario(email)
-      u   <- uOp match{
-        case None => DBIO.failed(new Exception(s"No existe el usuario con email: $email"))
-        case Some(u) => DBIO.successful(u) 
-      }
-      _   <- _borrarUsuario(u)
-    }yield("Se borro el usuario")
-  }
-  
-  def _borrarUsuario(u:Usuario) = {
-    for{
-      r <- usuarios.filter(_.email === u.email).delete
-      _ <- r match{
-        case 1 => DBIO.successful("")
-        case _ => DBIO.failed(new Exception(""))
-      }
-    }yield(r)
-  }*/
 }

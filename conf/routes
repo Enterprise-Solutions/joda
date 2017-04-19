@@ -20,6 +20,7 @@ POST	/lugares					controllers.LugaresController.crearLugar()
 DELETE	/lugares/:nombre			controllers.LugaresController.borrar(nombre)
 
 GET		/marcaciones				controllers.MarcacionesController.index(usuario:Option[Long], lugar:Option[Long])
+POST 	/marcaciones				controllers.MarcacionesController.crearMarcacion()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
