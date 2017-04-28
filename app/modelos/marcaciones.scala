@@ -17,8 +17,8 @@ case class DatosUsuario(
 case class Marcacion(
   id: Long,
   usuario_id: Long,
-  lugar: String,
-  fecha: Date
+  fecha: Date,
+  lugar: String
 )
 
 case class DatosCrearUsuario(
@@ -26,12 +26,6 @@ case class DatosCrearUsuario(
   apellido: String,
   nombre: String,
   password: String    
-)
-
-case class DatosCrearLugar(
-  nombre: String,
-  latitud: Double,
-  longitud: Double    
 )
 
 object Marcaciones{
@@ -70,7 +64,7 @@ object Marcaciones{
   }
   
   def _createMarking(usuario_id: Long,lugar: String,fecha: Date): Try[Marcacion] = {
-    val m1 = Marcacion(marcaciones.length+1,usuario_id,lugar,fecha)
+    val m1 = Marcacion(marcaciones.length+1,usuario_id,fecha,lugar)
     marcaciones = marcaciones.:+(m1)
     /*Failure(new Exception("Error al insertertar en la base de datos"))*/Success(m1)
   }
