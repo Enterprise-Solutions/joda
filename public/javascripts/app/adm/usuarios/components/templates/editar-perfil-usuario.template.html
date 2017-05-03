@@ -1,0 +1,48 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><i class="fa fa-users fa-fw"></i>&nbsp;<a href="#/adm/usuarios/listar">Usuarios</a></li>
+        <li *ngIf="usuario"><a style="cursor: pointer;" (click)="volver()">{{usuario.email}}</a></li>
+        <li *ngIf="perfil"><a style="cursor: pointer;" (click)="volverPrincipal()">{{perfil.nombre}}</a></li>
+        <li class="active" *ngIf="perfil">Roles</li>
+    </ol>
+</section>
+<div class="container-fluid">
+    <template [ngIf]="tabs">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li *ngFor="let tab of tabs" [class.active]="tab.active" role="presentation" style="cursor: pointer;">
+                        <a (click)="gotoTab(tab)">{{tab.title}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </template>
+</div>
+<br>
+<legend class="text-info"><i class="fa fa-cubes fa-fw"></i> Roles</legend>
+<div class="container-fluid">
+    <div class="container-fluid">
+        <form>
+            <fieldset>
+                <roles [usuarioId]="idPersona"
+                       [perfilId]="idPerfil"></roles>
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- ************ NOTIFICACIONES ************-->
+    <div id="message">
+        <div class="container-fluid" >
+            <div id="inner-message">
+                <div  class="alert alert-success" [hidden]="!mostrarMensajeExito">
+                    <strong>{{mensajeAlerta}}</strong>
+                </div>
+
+                <div  class="alert alert-danger" [hidden]="!mostrarMensajeError">
+                    <strong> {{mensajeAlerta}} &nbsp; &nbsp; &nbsp;</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

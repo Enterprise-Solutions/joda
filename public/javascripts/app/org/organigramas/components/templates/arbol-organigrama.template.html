@@ -1,0 +1,139 @@
+<template [ngIf]="organigrama">
+    <div class="container-fluid">
+        <div class="row">
+            <ul>
+                <li class="list-unstyled list-node-tree">
+                    <template [ngIf]="!organigrama.es_editable">
+                        <div class="col-md-9 list-node-text" (click)="toggle()">
+                            <i [class]="organigrama.tipoCaret"></i>
+                            {{organigrama.nombre}}
+                        </div>
+
+                        <div class="col-md-3 text-right">
+                            <button title="Agregar Dependencia" type="button" class="btn btn-sm btn-link" (click)="agregarNodo()">
+                                <i class="fa fa-fw fa-plus"></i>
+                            </button>
+                            |
+                            <button title="Editar Dependencia" type="button" class="btn btn-sm btn-link" (click)="editarNodo()">
+                                <i class="fa fa-fw fa-pencil"></i>
+                            </button>
+                            |
+                            <button title="Eliminar Dependencia" type="button" class="btn btn-sm btn-link" (click)="eliminarme()">
+                                <i class="fa fa-fw fa-remove"></i>
+                            </button>
+                        </div>
+                    </template>
+                    <template [ngIf]="organigrama.es_editable">
+                        <div class="col-md-12 list-node-text">
+                            <div class="container-fluid">
+                                <form>
+                                    <fieldset>
+                                        <legend class="text-info">Agregar Dependencia Existente</legend>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="subParte">Dependencia</label>
+                                                    <select id="subParte" name="subParte" class="form-control" [(ngModel)]="subParteSelected">
+                                                        <option *ngFor="let subParte of subPartesDisponibles" [value]="subParte.id"
+                                                                [selected]="subParte.id == subParteSelected"
+                                                                placeholder="Dependencia">
+                                                            {{subParte.nombre}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-success" (click)="agregarme()">
+                                                        Agregar
+                                                    </button>
+                                                    <button type="button" class="btn btn-default" (click)="cancelarme()">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                                <br>
+                                <form>
+                                    <fieldset>
+                                        <legend class="text-info">Nueva Dependencia</legend>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="nombre">Dependencia</label>
+                                                    <input id="nombre" name="nombre" type="text" class="form-control"
+                                                           placeholder="Nombre de la Dependencia"
+                                                           [(ngModel)]="organigrama.nombre">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="tipo">Tipo</label>
+                                                    <select id="tipo" name="tipo" class="form-control" [(ngModel)]="tipoSelected">
+                                                        <option *ngFor="let tipo of tiposOrganigrama" [value]="tipo.id"
+                                                                [selected]="tipo.id == tipoSelected"
+                                                                placeholder="Tipo de Dependencia">
+                                                            {{tipo.id}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="descrip">Descripci&oacute;n</label>
+                                                    <textarea id="descrip" name="descrip" class="form-control" rows="2"
+                                                              placeholder="Descripcion"
+                                                              [(ngModel)]="organigrama.descripcion"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-success" (click)="guardarme()">
+                                                        Guardar
+                                                    </button>
+                                                    <button type="button" class="btn btn-default" (click)="cancelarme()">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="clearfix"></div>
+                </li>
+                <div style="clear: both;"></div>
+                <template [ngIf]="organigrama.expandido">
+                    <template ngFor let-parte [ngForOf]="organigrama.partes">
+                        <arbol-organigrama [organigrama]="parte"
+                                           [padreId]="organigrama.id"
+                                           (agregame)="agregarSubParte($event)"
+                                           (guardame)="guardarNodo($event)"
+                                           (eliminame)="eliminarNodo($event)"
+                                           (cancelame)="cancelarNodo($event)"></arbol-organigrama>
+                    </template>
+                </template>
+                <template [ngIf]="verNotificacion">
+                    <notifications [notification]="notificacion"
+                                   (close)="closeNotification($event)"></notifications>
+                </template>
+                
+                <template [ngIf]="loadingData">
+                    <div class="col-md-2 col-md-offset-5" style="color:#286090;">
+                        <i class="fa fa-refresh fa-spin fa-4x"></i>
+                    </div>
+                </template>
+            </ul>
+        </div>
+    </div>
+</template>

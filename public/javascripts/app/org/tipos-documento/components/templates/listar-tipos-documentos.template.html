@@ -1,0 +1,107 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-credit-card fa-fw"></i>&nbsp;Tipos de Documento</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <form (ngSubmit)="filtrar()">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input id="nombre" name="nombre" type="text" class="form-control"
+                           [(ngModel)]="search.nombre">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <input type="submit" class="btn btn-info" value="Buscar">
+                <input type="reset" class="btn btn-warning" value="Limpiar" (click)="limpiar()">
+            </div>
+        </div>
+    </form>
+
+    <br>
+
+    <template [ngIf]="numResults == 0 && !loadingData">
+        <div class="row">
+            <div class="col-md-12 jumbotron">
+                <h3 class="text-danger">No se encontraron registros!</h3>
+                <p>No se encontraron tipos de documento que coincidan con sus filtros de b&uacute;squeda.</p>
+                <p>
+                    <button type="button" class="btn btn-success" (click)="gotoCrearTipoDocumento()">
+                        <span class="fa fa-plus"></span>&nbsp;Agregar Tipo
+                    </button>
+                </p>
+            </div>
+        </div>
+    </template>
+
+    <template [ngIf]="numResults > 0 && !loadingData">
+        <div class="row">
+            <div class="pull-right">
+                <button type="button" class="btn btn-success" (click)="gotoCrearTipoDocumento()">
+                    <span class="fa fa-plus"></span>&nbsp;Agregar Tipo
+                </button>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th *ngFor="let head of headers" (click)="ordenar(head)">
+                            {{head.descrip}}
+                            <template [ngIf]="head.columna == order.sort && order.dir == 'asc'">
+                                <span><i class="fa fa-arrow-up fa-fw"></i></span>
+                            </template>
+                            <template [ngIf]="head.columna == order.sort && order.dir == 'desc'">
+                                <span><i class="fa fa-arrow-down fa-fw"></i></span>
+                            </template>
+                        </th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let tipoDocumento of tiposDocumento">
+                        <td class="col-md-10">
+                            <a [routerLink]="['EditarTipoDocumentoComponent', {tipo_id: tipoDocumento.id}]">
+                                {{tipoDocumento.nombre}}
+                            </a>
+                        </td>
+
+                        <td class="text-center col-md-2">
+                            <a class="text-danger">
+                                <i (click)="onDelete(tipoDocumento.id)" class="fa fa-remove fa-fw"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 text-left text-success">
+                Total de Registros: <strong>{{numResults}}</strong>
+            </div>
+            <div class="col-md-6 text-right">
+                <button class="btn btn-link" [disabled]="pagination.pagina == 0" type="button" (click)="prevPage()">Anterior</button>
+                P&aacute;g.
+                <input id="fontSize" style="width: 50px; text-align: center;" [value]= "paginaActual" (change)="changePage($event.target.value)">
+                de {{totalDePaginas}}
+                <button class="btn btn-link" [disabled]="pagination.pagina + 1 == totalDePaginas" type="button" (click)="nextPage()">Siguiente</button>
+            </div>
+        </div>
+    </template>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>

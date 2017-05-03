@@ -1,0 +1,81 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-location-arrow fa-fw"></i>&nbsp;Listado de Marcaciones</li>
+    </ol>
+</section>
+
+
+<div class="container-fluid">
+    <!--<template [ngIf]="numResults == 0 && !loadingData">-->
+        <div class="row">
+            <div class="col-md-12 jumbotron">
+                <h3>Sin Registros.</h3>
+                <p>La organizaci&oacute;n no tiene marcaciones registrados.</p>
+                <p>
+                    <button type="button" class="btn btn-default" (click)="gotoCrearBanco()">
+                        <i class="fa fa-plus fa-fw"></i> Agregar
+                    </button>
+                </p>
+            </div>
+        </div>
+    <!--</template>-->
+
+    <!--<template [ngIf]="numResults > 0 && !loadingData">-->
+    <template [ngIf]="true">
+
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+
+                        </tr>
+                    </tbody>
+                    <!--<template [ngIf]="headers">-->
+                        <!--<thead>-->
+                        <!--<tr>-->
+                            <!---->
+                            <!--<th class="text-center">Eliminar</th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                    <!--</template>-->
+
+                    <!--<temarcacionesngIf]="tarjetas">-->
+                        <!--<tbody>-->
+                        <!--<tr *ngFor="let datomarcacionesetas">-->
+                            <!--&lt;!&ndash;<td class="col-md-2">&ndash;&gt;-->
+                                <!--&lt;!&ndash;<a [routerLink]="['EditarCajaComponent', {caja_id: dato.id}]">{{dato.nombre}}</a>&ndash;&gt;-->
+                            <!--&lt;!&ndash;</td>&ndash;&gt;-->
+                            <!--<td class="col-md-10 text-center">-->
+                                <!--{{dato.nombre}}-->
+                            <!--</td>-->
+                            <!--&lt;!&ndash;<td class="col-md-2 text-center">&ndash;&gt;-->
+                                <!--&lt;!&ndash;<a class="text-danger" style="cursor:pointer;">&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<i (click)="eliminarBanco(dato.id)" class="fa fa-remove fa-fw"></i>&ndash;&gt;-->
+                                <!--&lt;!&ndash;</a>&ndash;&gt;-->
+                            <!--&lt;!&ndash;</td>&ndash;&gt;-->
+                        <!--</tr>-->
+                        <!--</tbody>-->
+                    <!--</template>-->
+                </table>
+            </div>
+        </div>
+
+    </template>
+
+    <template [ngIf]="loadingData">
+        <div class="col-md-12 text-center text-darkblue">
+            <i class="fa fa-refresh fa-spin fa-4x"></i>
+        </div>
+    </template>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>

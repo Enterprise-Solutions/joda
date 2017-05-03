@@ -1,0 +1,53 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><i class="fa fa-user-md fa-fw"></i>&nbsp;<a href="#/adm/roles/listar">Roles</a></li>
+        <li *ngIf="rol">{{rol.nombre}}</li>
+        <li>editar rol</li>
+    </ol>
+</section>
+<div class="container-fluid">
+    <form (ngSubmit)="onSubmit()" #crearRolForm="ngForm">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input id="nombre" type="text" class="form-control" required
+                           [(ngModel)]="rol.nombre" ngControl="nombre" #nombre="ngModel" name="nombre">
+                    <div [hidden]="nombre.valid || nombre.untouched" class="alert alert-danger">
+                        El nombre es obligatorio.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" class="form-control"
+                           [(ngModel)]="rol.descripcion" name="descripcion"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-info" type="submit" [disabled]="!crearRolForm.form.valid">Guardar</button>
+                <button class="btn btn-default" type="button" (click)="listarRoles()">Cancelar</button>
+            </div>
+        </div>
+    </form>
+
+
+
+    <!-- ************ NOTIFICACIONES ************-->
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+
+    <!-- ************ OPERACIONES ASOCIADAS AL ROL ************-->
+    <br/><br/>
+    <operaciones [rolId]="idRol"></operaciones>
+</div>
+

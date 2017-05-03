@@ -1,0 +1,71 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><i class="fa fa-users fa-fw"></i>&nbsp;<a href="#/adm/usuarios/listar">Usuarios</a></li>
+        <li *ngIf="usuario"><a (click)="volver()">{{usuario.email}}</a></li>
+        <li class="active" > Nuevo Perfil</li>
+    </ol>
+</section>
+<div class="container-fluid">
+    <form (ngSubmit)="onSubmit()" #crearPerfilUsuarioForm="ngForm">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="nombre">Nombre de Perfil: </label>
+                    <input id="nombre" type="text" class="form-control" required
+                           [(ngModel)]="nombrePerfil" ngControl="nombre" 
+                           #nombre="ngModel"
+                           name="nombre">
+                    <div [hidden]="nombre.valid || nombre.untouched" class="alert alert-danger">
+                        El nombre de Perfil es obligatorio.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="empresa">Empresa</label>
+                    <select id="empresa"
+                            class="form-control" required
+                            [(ngModel)]="empresaElegida"
+                            ngControl="empresa"
+                            #empresa="ngModel"
+                            name="empresa">
+                        <option *ngFor="let e of empresas" [value]="e.id">{{e.nombre}}</option>
+                    </select>
+                    <div [hidden]="empresa.valid || empresa.untouched" class="alert alert-danger">
+                        La empresa es obligatoria.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="checkbox">
+                    <label for="perfilDefecto">
+                        <input id="perfilDefecto" type="checkbox"
+                               [(ngModel)]="perfilPorDefecto" 
+                               ngControl="perfilDefecto"
+                               name="perfilDefecto">
+                        Usar como perfil por defecto
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-info" type="submit" [disabled]="!crearPerfilUsuarioForm.form.valid">Guardar</button>
+                <button class="btn btn-default" type="button" (click)="volver()">Cancelar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- ************ NOTIFICACIONES ************-->
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>

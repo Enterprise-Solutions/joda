@@ -1,0 +1,114 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><i class="fa fa-users fa-fw"></i>&nbsp;<a href="#/adm/usuarios/listar">Usuarios</a></li>
+        <li *ngIf="usuario"><a [routerLink]="['EditarPrincipalUsuarioComponent', {id: usuario.id}]">{{usuario.email}}
+        </a></li>
+        <li class="active">Perfiles</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <template [ngIf]="tabs">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li *ngFor="let tab of tabs" [class.active]="tab.active" role="presentation" style="cursor: pointer;">
+                        <a (click)="gotoTab(tab)">{{tab.title}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </template>
+</div>
+
+<div *ngIf="usuario">
+    <br>
+    <div class="container-fluid">
+        <!-- <form (ngSubmit)="onSubmit()" #editarUsuarioForm="ngForm"> -->
+
+            <!-- ************ PERFIL DE USUARIO ************-->
+            <fieldset>
+                <legend class="text-info"><i class="fa fa-users fa-fw"></i> Perfiles</legend>
+                <div class="row" *ngIf="cantPerfiles > 0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th class="text-center">Perfil</th>
+                                <th class="text-center">Perfil por defecto</th>
+                                <th class="text-center">Área de Gestión</th>
+                                <th class="text-center">Empresa</th>
+                                <th class="text-center">Eliminar</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let perfil of perfiles">
+                                <td class="col-md-1 text-center" style="vertical-align: middle;">
+                                    <a [routerLink]="['EditarPrincipalPerfilComponent', {id: idUsuario, idPerfil: perfil.id}]">
+                                        {{perfil.nombre}}
+                                    </a>
+
+                                </td>
+                                <td class="col-md-1 text-center">
+                                    <div *ngIf="perfil.es_principal == true">
+                                        <i class="fa fa fa-check fa-fw text-success"></i>
+                                    </div>
+                                </td>
+                                <td class="col-md-2 text-left" *ngIf='perfil.organigrama_parte.length > 0'>
+                                   <div *ngFor="let dato of perfil.organigrama_parte">
+                                        {{dato}}
+                                    </div>
+                                </td>
+                                <td class="text-center col-md-1" *ngIf='perfil.organigrama_parte.length == 0'>
+                                    <i class="fa fa-minus fa-fw"></i>
+                                </td>
+                                <td class="col-md-1 text-center" style="vertical-align: middle;">
+                                    {{perfil.organigrama}}
+                                </td>
+
+                                <td class="text-center col-md-1" style="vertical-align: middle;">
+                                    <a class="text-danger" style="cursor:pointer;">
+                                        <i (click)="borrarPerfil(perfil.id)" class="fa fa-trash-o fa-lg"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-md-push-10 col-md-2">
+                        <button type="button" class="btn btn-success" (click)="agregarPerfil()">
+                             <i class="fa fa-user-plus"></i> Agregar Perfil
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="cantPerfiles == 0">
+                    <div class="col-md-8 jumbotron">
+                        <h3>Usuario sin perfil</h3>
+                        <p>El usuario no cuenta con ningun perfil. Comience asociando Perfiles al usuario</p>
+                        <p>
+                            <button type="button" class="btn btn-default" (click)="agregarPerfil()">Agregar Perfil</button>
+                        </p>
+                    </div>
+                </div>
+            </fieldset>
+
+
+        <!-- </form> -->
+    </div>
+
+
+    <br>
+
+    <template [ngIf]="loadingData">
+        <div class="col-md-2 col-md-offset-5" style="color:#286090;">
+            <i class="fa fa-refresh fa-spin fa-4x"></i>
+        </div>
+    </template>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>

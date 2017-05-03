@@ -1,0 +1,91 @@
+<div class="row">
+    <div *ngIf="cantidadRoles == 0">
+        <div class="col-md-6 jumbotron">
+            <h3>Perfil sin roles asociados</h3>
+            <p>El perfil actual no tiene roles asociados. Comience asociando roles al Perfil </p>
+            <p>
+                <!--<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">
+                    <i class="fa fa-plus-square"></i> Asociar Rol
+                </button>-->
+                <!--<button type="button" class="btn btn-default" (click)="modal.open()">Asociar Roles</button>-->
+                <button type="button" class="btn btn-success" (click)="abrirModal()">
+                        <i class="fa fa-plus"></i> Asociar Roles
+                </button>
+                <!--<button type="button" class="btn btn-default" (click)="animationsEnabled = !animationsEnabled">Toggle Animation ({{ animationsEnabled }})</button>-->
+
+            </p>
+        </div>
+    </div>
+
+    <div *ngIf="cantidadRoles > 0">
+        <div class="col-md-6">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr class="text-center">
+                        <th class="col-md-4">Rol</th>
+                        <th class="col-md-2">Eliminar Rol</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr *ngFor="let rol of roles" class="text-center">
+                        <!-- DESCRIPCION ROL-->
+                        <td>
+                            {{rol.rol}}
+                        </td>
+                        <td>
+                            <a class="text-danger" style="cursor:pointer;">
+                                <i (click)="borrarRol(rol.id)" class="fa fa-trash-o fa-lg"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-success" (click)="abrirModal()">
+                    <i class="fa fa-plus"></i> Agregar Rol
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+
+    <!-- MODAL -->
+    <modal [animation]="animationsEnabled" (onClose)="onClose($event)" #modal>
+        <modal-header [show-close]="true">
+            <h4 class="modal-title">Roles Disponibles</h4>
+        </modal-header>
+        <modal-body>
+            <div *ngIf="cantRolesDisponibles > 0">
+                <ul>
+                    <!--<li *ngFor="let rol of rolesDisponibles">-->
+                        <!--<label  (click)="$event.preventDefault(); rolSelected = rol; nombreRol = rol.nombre">{{ rol.nombre }}</label>-->
+                        <!--<input id="rolSeleccionado" type="checkbox" [(ngModel)]="rol.seleccionado" name="rolSeleccionado">-->
+                    <!--</li>-->
+                    <li *ngFor="let rol of rolesDisponibles">
+                        <label class="checkbox">
+                            <input id="rolSeleccionado" type="checkbox" [(ngModel)]="rol.seleccionado" name="rolSeleccionado">
+                            {{ rol.nombre }}
+                        </label>
+                    </li>
+                </ul>
+                <!--Rol seleccionado: <b>{{ nombreRol }}</b>-->
+            </div>
+            <div *ngIf="cantRolesDisponibles == 0">
+                No existen roles para asociar a este Perfil
+            </div>
+        </modal-body>
+        <modal-footer [show-default-buttons]="true"></modal-footer>
+    </modal>
+    <!-- FIN MODAL -->
+</div>

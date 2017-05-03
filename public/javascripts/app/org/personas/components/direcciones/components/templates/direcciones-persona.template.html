@@ -1,0 +1,27 @@
+<template [ngIf]="persona">
+    <section class="content-header">
+        <ol class="breadcrumb">
+            <li><a href="#/org/personas/listar"><i class="fa fa-users fa-fw"></i>&nbsp;Personas</a></li>
+            <li><a href="#/org/personas/{{persona.id}}/editar">#{{persona.id}}</a></li>
+            <li class="active">Direcciones</li>
+        </ol>
+    </section>
+
+    <div class="container-fluid">
+        <template [ngIf]="tabs">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs">
+                        <li *ngFor="let tab of tabs" [class.active]="tab.active" role="presentation" style="cursor: pointer;">
+                            <a (click)="gotoTab(tab)">{{tab.title}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <br>
+
+    <direcciones [orgParteId]="persona.org_parte_id"></direcciones>
+</template>

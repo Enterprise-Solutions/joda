@@ -1,0 +1,6 @@
+<template [ngIf]="notification">
+    <div id="notification" class="alert" [ngClass]="getClass()" role="alert">
+        <h4><strong><i [ngClass]="getIcon()"></i> {{title}}</strong></h4>
+        <p>{{notification.message}}</p>
+    </div>
+</template>

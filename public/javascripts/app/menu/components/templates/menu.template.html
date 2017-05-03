@@ -1,0 +1,61 @@
+<template [ngIf]="true">
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#module-navbar" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+
+				<a class="navbar-brand" href="/">
+					<i class="fa fa-beer fa-fw"></i>
+					Joda
+				</a>
+			</div>
+
+			<div id="module-navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li style="cursor: pointer;">
+						<a [routerLink]="['MarcComponent']">
+							Marcaciones
+						</a>
+					</li>
+				</ul>
+
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle text-center" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							<i class="fa fa-user fa-fw"></i> {{username}}&nbsp;
+							<span class="text-info"><strong>[{{perfil}}]</strong></span>
+							<!--<span class="text-info"><strong>{{organigrama}}</strong>]</span>-->
+							<!--<span class="caret"></span>-->
+						</a>
+						<!--<ul class="dropdown-menu">-->
+							<!--<li>-->
+								<!--<a title="Mi Perfil" (click)="onMiPerfilSelect()">-->
+									<!--{{username}}-->
+								<!--</a>-->
+							<!--</li>-->
+							<!--<li role="separator" class="divider"></li>-->
+							<!--<template ngFor let-profile [ngForOf]="perfiles">-->
+								<!--<li style="cursor: pointer;">-->
+									<!--<a title="Diosnel" (click)="onPerfilSelect(profile)">-->
+										<!--<span>Diosnel <strong>[E.S]</strong></span>-->
+									<!--</a>-->
+								<!--</li>-->
+							<!--</template>-->
+							<!--<li role="separator" class="divider"></li>-->
+							<!--<li>-->
+								<!--<a title="Salir" href="/adm/autenticacion/logout">-->
+									<!--<i class="fa fa-sign-out fa-fw"></i> Salir-->
+								<!--</a>-->
+							<!--</li>-->
+						<!--</ul>-->
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</template>

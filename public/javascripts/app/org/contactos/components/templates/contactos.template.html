@@ -1,0 +1,118 @@
+<div class="container-fluid">
+    <template [ngIf]="cntContactos <= 0">
+        <div class="row">
+            <div class="col-md-12 jumbotron">
+                <h3>Sin Registros.</h3>
+                <p>La persona no tiene contactos registrados.</p>
+                <p>
+                    <button type="button" class="btn btn-success" (click)="agregarContacto()">
+                        <i class="fa fa-plus fa-fw"></i>&nbsp;Agregar Contacto
+                    </button>
+                </p>
+            </div>
+        </div>
+    </template>
+
+    <template [ngIf]="cntContactos > 0">
+        <div class="row">
+            <div class="pull-right">
+                <button type="button" class="btn btn-success" (click)="agregarContacto()">
+                    <i class="fa fa-plus fa-fw"></i>&nbsp;Agregar Contacto
+                </button>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <template [ngIf]="headers">
+                        <thead>
+                            <tr>
+                                <th *ngFor="let head of headers">
+                                    {{head.descrip}}
+                                </th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                    </template>
+
+                    <template [ngIf]="contactos">
+                        <tbody>
+                            <tr *ngFor="let contacto of contactos">
+                                <td class="col-md-5">
+                                    <a style="cursor: pointer;" (click)="getContacto(contacto)">
+                                        {{contacto.org_contacto_tipo_id}}
+                                    </a>
+                                </td>
+
+                                <td class="col-md-5">
+                                    <a style="cursor: pointer;" (click)="getContacto(contacto)">
+                                        {{contacto.contacto}}
+                                    </a>
+                                </td>
+
+                                <td class="col-md-2 text-center">
+                                    <i class="text-danger fa fa-remove fa-fw"
+                                       style="cursor: pointer;" (click)="eliminarContacto(contacto)"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <modal [animation]="animationsEnabled" (onClose)="onClose($event)" #modal>
+        <modal-header [show-close]="true">
+            <h4 *ngIf="!editandoContacto" class="modal-title">Nueva Contacto</h4>
+            <h4 *ngIf="editandoContacto" class="modal-title">Editar Contacto</h4>
+        </modal-header>
+
+        <modal-body>
+            <div class="container-fluid">
+                <form (ngSubmit)="onSubmit()" #crearEditarContacto="ngForm" *ngIf="utilizandoFormulario">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="org_contacto_tipo_id">Tipo de Contacto</label>
+                                <select id="org_contacto_tipo_id" name="org_contacto_tipo_id" class="form-control" required
+                                        [(ngModel)]="nuevoContacto.org_contacto_tipo_id" ngControl="org_contacto_tipo_id" #org_contacto_tipo_id="ngModel">
+                                    <option *ngFor="let tipo of tiposContacto" [value]="tipo.id">{{tipo.id}}</option>
+                                </select>
+                                <div [hidden]="org_contacto_tipo_id.valid || org_contacto_tipo_id.untouched" class="alert alert-danger">
+                                    Debe ingresar el tipo de contacto.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="contacto">Contacto</label>
+                                <input id="contacto" name="contacto" type="text" class="form-control" required
+                                       [(ngModel)]="nuevoContacto.contacto" ngControl="contacto" #contacto="ngModel">
+                                <div [hidden]="contacto.valid || contacto.untouched" class="alert alert-danger">
+                                    Debe ingresar el contacto.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-warning" type="submit" [disabled]="!crearEditarContacto.form.valid">Guardar</button>
+                            <button class="btn btn-default" type="button" (click)="cerrarFormulario()">Cancelar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </modal-body>
+    </modal>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>

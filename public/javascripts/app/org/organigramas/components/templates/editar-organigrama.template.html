@@ -1,0 +1,62 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><a href="#/org/organigramas/visualizar"><i class="fa fa-sitemap fa-fw"></i>&nbsp;Organigramas</a></li>
+        <li class="active">Editar</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <template [ngIf]="organigrama && !loadingData">
+        <form>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="nombre">Dependencia</label>
+                        <input id="nombre" name="nombre" type="text" class="form-control" [(ngModel)]="organigrama.nombre">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo" name="tipo" class="form-control" [(ngModel)]="tipoSelected">
+                            <option *ngFor="let tipo of tiposOrganigrama" [value]="tipo.id"
+                                    [selected]="tipo.id == tipoSelected" placeholder="Tipo de Dependencia">
+                                {{tipo.id}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="descrip">Descripci&oacute;n</label>
+                        <textarea id="descrip" name="descrip" class="form-control" rows="2"
+                                  placeholder="Descripcion" [(ngModel)]="organigrama.descripcion">
+                        </textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-success" (click)="editarOrganigrama()">Guardar</button>
+                    <button type="button" class="btn btn-default" (click)="listarOrganigrama()">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </template>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+
+    <template [ngIf]="loadingData">
+        <div class="col-md-2 col-md-offset-5" style="color:#286090;">
+            <i class="fa fa-refresh fa-spin fa-4x"></i>
+        </div>
+    </template>
+</div>

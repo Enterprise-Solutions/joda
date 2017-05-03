@@ -1,0 +1,173 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><a href="#/adm/usuarios/listar"><i class="fa fa-users fa-fw"></i>&nbsp;Usuarios</a></li>
+        <li class="active">Crear</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <form #crearUsuarioForm="ngForm">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="persona">Persona / Documento</label>
+                    <autocomplete id="persona"
+                                  [permiteNuevo]="true"
+                                  [datos]="personasDisponibles"
+                                  [dato]="cadenaSeleccionada"
+                                  [mostrarCampo]="'nombres'"
+                                  (agregar)="agregarPersona($event)"
+                                  (seleccionar)="seleccionarPersonaDisponible($event)"
+                                  (buscar)="getPersonasDisponibles($event)">
+                    </autocomplete>
+                </div>
+            </div>
+        </div>
+
+        <template [ngIf]="usuario">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="text" class="form-control" required
+                               [(ngModel)]="usuario.email" ngControl="email" #email="ngModel">
+                        <div [hidden]="email.valid || email.untouched" class="alert alert-danger">
+                            Debe ingresar un email.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="password">Contrase&ntilde;a</label>
+                        <input id="password" name="password" type="password" class="form-control" required
+                               [(ngModel)]="usuario.password" ngControl="password" #password="ngModel">
+                        <div [hidden]="password.valid || password.untouched" class="alert alert-danger">
+                            Debe ingresar una contrase&ntilde;a.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="confirmacion">Confirmaci&oacute;n</label>
+                        <input id="confirmacion" name="confirmacion" type="password" class="form-control" required
+                               [(ngModel)]="usuario.confirmar_pass" ngControl="confirmacion" #confirmacion="ngModel">
+                        <div [hidden]="confirmacion.valid || confirmacion.untouched" class="alert alert-danger">
+                            Debe ingresar nuevamente la contrase&ntilde;a.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="onSubmit()" class="btn btn-success" [disabled]="!crearUsuarioForm.form.valid">Guardar</button>
+                    <button type="button" class="btn btn-default" (click)="onCancel()">Cancelar</button>
+                </div>
+            </div>
+        </template>
+    </form>
+
+    <modal [animation]="animationEnabled" (onClose)="onClose($event)" #modal>
+        <modal-body>
+            <persona-form [fromModal]="true" [data]="cadenaBuscada" (personaCreada)="agregarUsuarioPersona($event)"></persona-form>
+        </modal-body>
+    </modal>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>
+
+
+
+<!--
+
+
+<div class="container-fluid" *ngIf="!crearNuevoUsuario">
+    <div class="row">
+        <div class="col-md-9">
+            <h4 class="text-info">
+                Nuevo Usuario
+            </h4>
+        </div>
+        <div class="col-md-3" >
+            <button type="button" class="btn btn-success" (click)="nuevaPersona()">
+                <span class="fa fa-plus"></span>
+                Crear Nueva Persona
+            </button>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <br>
+    <fieldset>
+        <legend>B&uacute;squeda</legend>
+        <div class="row">
+            &lt;!&ndash;<div class="col-md-6">
+                <div class="form-group">
+                    <label for="busquedaInput">Buscar Persona (Nombre - Apellido - Cedula)</label>
+                    <input type="text" class="form-control"
+                           id="busquedaInput"
+                           (keyup)="buscarPersonasDisponibles()"
+                           [(ngModel)]="personaBuscada"
+                           name="busqueda">
+                </div>
+            </div>&ndash;&gt;
+        </div>
+
+        <div *ngIf="cantidadPersonasDisponibles > 0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Documento</th>
+                        <th>Crear</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let persona of personasDisponibles">
+                        <td class="col-md-3">
+                            {{persona.nombre}}
+                        </td>
+                        <td class="col-md-3">
+                            {{persona.apellido}}
+                        </td>
+                        <td class="col-md-3">
+                            {{persona.documento}}
+                        </td>
+                        <td class="text-center col-md-1">
+                            <a style="cursor: pointer;" (click)="nuevoUsuario(persona.id)" class="text-warning">
+                                <i  class="fa fa-user-plus fa-fw"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br>
+    </fieldset>
+</div>
+
+&lt;!&ndash;
+<div *ngIf="crearNuevaPersona">
+    <persona-form></persona-form>
+</div>
+&ndash;&gt;
+
+<div *ngIf="crearNuevoUsuario">
+    <usuario-form
+            [idPersona]="idPersona"
+            [crearNuevaPersona]="crearNuevaPersona">
+    </usuario-form>
+</div>
+-->
+
+
+

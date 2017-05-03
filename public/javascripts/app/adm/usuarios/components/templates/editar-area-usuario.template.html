@@ -1,0 +1,108 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><i class="fa fa-users fa-fw"></i>&nbsp;<a href="#/adm/usuarios/listar">Usuarios</a></li>
+        <li *ngIf="usuario"><a style="cursor: pointer;" (click)="volver()">{{usuario.email}}</a></li>
+        <li *ngIf="perfil"><a style="cursor: pointer;" (click)="volverPrincipal()">{{perfil.nombre}}</a></li>
+        <li class="active" *ngIf="perfil">Área de Gestión</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <template [ngIf]="tabs">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li *ngFor="let tab of tabs" [class.active]="tab.active" role="presentation" style="cursor: pointer;">
+                        <a (click)="gotoTab(tab)">{{tab.title}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </template>
+</div>
+<br>
+<div class="container-fluid">
+
+    <div class="container-fluid">
+        <form>
+            <fieldset>
+                <legend class="text-info"><i class="fa fa-map fa-fw"></i> Áreas de Gestión</legend>
+                <div class="row" *ngIf="cantAreas > 0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th class="text-center col-md-4">Área</th>
+                                <th class="text-center col-md-4">Tipo</th>
+                                <th class="text-center col-md-1">Eliminar</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let dato of areas">
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <div *ngIf="dato.id != 0" class="text-center">
+                                        {{dato.parte}}
+                                    </div>
+
+                                    <div *ngIf="dato.id == 0">
+                                    <select id="tipoInput" class="form-control"
+                                        [(ngModel)]="parteSeleccionada" name="tipoInput"
+                                            (ngModelChange)="onChangeCombo($event)">
+                                        <option *ngFor="let p of partes" [ngValue]="p">{{p.nombre}}</option>
+                                    </select>
+                                    </div>
+                                </td>
+                                <td class="text-center" style="vertical-align: middle;">
+                                    {{dato.parte_tipo}}
+                                </td>
+
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <div *ngIf="dato.id != 0">
+                                        <a class="text-danger" style="cursor:pointer;">
+                                        <i (click)="borrarArea(dato.adm_usuario_perfil_id, dato.id)" class="fa fa-trash-o fa-lg"></i>
+                                        </a>
+                                    </div>
+                                    <div *ngIf="dato.id == 0">
+                                        <a class="text-info" style="cursor:pointer;">
+                                            <i (click)="crearArea()" class="fa fa-floppy-o fa-lg"></i>
+                                        </a>
+                                    </div>
+                                </td>                             
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" *ngIf="!agregando">
+                            <button type="button" class="btn btn-success" (click)="agregarFila()">
+                                <i class="fa fa-plus"></i> Agregar Área de Gestión
+                            </button>
+                        </div>
+                        <div class="col-md-12" *ngIf="agregando">
+                            <button type="button" class="btn btn-danger" (click)="borrarFila()">
+                                <i class="fa fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="cantAreas == 0">
+                    <div class="col-md-8 jumbotron">
+                        <h3>Usuario sin Áreas de Gestión</h3>
+                        <p>El usuario no cuenta con ningun área de gestión asignada. Comience creando Áreas de Gestón para el perfil</p>
+                        <p>
+                            <button type="button" class="btn btn-success" (click)="agregarFila()">
+                                <i class="fa fa-plus"></i> Agregar Área de Gestión
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <!-- ************ NOTIFICACIONES ************-->
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>

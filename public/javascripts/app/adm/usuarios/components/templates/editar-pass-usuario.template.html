@@ -1,0 +1,118 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><i class="fa fa-users fa-fw"></i>&nbsp;<a href="#/adm/usuarios/listar">Usuarios</a></li>
+        <li *ngIf="usuario"><a [routerLink]="['EditarPrincipalUsuarioComponent', {id: usuario.id}]">{{usuario.email}}
+        </a></li>
+        <li class="active">Contraseña</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <template [ngIf]="tabs">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li *ngFor="let tab of tabs" [class.active]="tab.active" role="presentation" style="cursor: pointer;">
+                        <a (click)="gotoTab(tab)">{{tab.title}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </template>
+</div>
+
+<div *ngIf="usuario">
+    <br>
+    <div class="container-fluid">
+        <form (ngSubmit)="onSubmit()" #editarUsuarioForm="ngForm">
+
+            <!-- ************ CAMBIO DE CONTRASEÑA ************-->
+            <fieldset>
+                <legend class="text-info"><i class="fa fa-key fa-fw"></i> Contraseña</legend>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="checkbox">
+                            <label for="cambiar_pwd">
+                                <input id="cambiar_pwd" type="checkbox"
+                                       [(ngModel)]="usuario.cambiar_pwd" 
+                                       ngControl="cambiar_pwd"
+                                       name="cambiar_pwd">
+                                Editar Contraseña actual
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="password">Nueva Contraseña</label>
+                            <input id="password" type="password" class="form-control"
+                                   [(ngModel)]="usuario.password" ngControl="password" #password="ngModel"
+                                   [disabled]="!usuario.cambiar_pwd"
+                                   name="password">
+                            <div [hidden]="password.valid || password.untouched" 
+                                    class="alert alert-danger">
+                                La contraseña es obligatoria
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="confirmar_pass">Confirmar Nueva Contraseña</label>
+                            <input id="confirmar_pass" type="password" class="form-control"
+                                   [(ngModel)]="usuario.confirmar_pass" ngControl="confirmar_pass" #confirmar_pass="ngModel"
+                                   [disabled]="!usuario.cambiar_pwd"
+                                   name="confirmar_pass">
+                            <div [hidden]="confirmar_pass.valid || confirmar_pass.untouched" class="alert alert-danger">
+                                Es necesario confirmar la nueva contraseña
+                            </div>
+                            <div [hidden]="usuario.password == usuario.confirmar_pass" class="warning alert-warning">
+                                Las contraseñas deben coincidir
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="row">
+                <!-- Boton Guardar -->
+                <div class="col-md-12" [hidden]="!editarUsuario">
+                    <button class="btn btn-warning" type="submit"  [disabled]="!editarUsuarioForm.form.valid || (usuario.password != usuario.confirmar_pass)">Guardar</button>
+                </div>
+
+
+
+                <!-- Boton de editar -->
+                <div class="col-md-12"  [hidden]="editarUsuario">
+                    <button class="btn btn-success" type="button" (click)="editar()">Editar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <br>
+
+    <!-- ************ VOLVER AL LISTADO ************-->
+<!--     <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-push-10 col-md-2">
+                <button type="button" class="btn btn-default" (click)="listarUsuarios()">
+                    Volver al Listado
+                </button>
+            </div>
+        </div>
+    </div> -->
+
+
+
+    <!-- Mensaje -->
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>

@@ -1,0 +1,118 @@
+<div class="container-fluid">
+    <form (ngSubmit)="onSubmit()" #crearPersonaForm="ngForm">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="nombres">Nombre/s</label>
+                    <input id="nombres" name="nombres" type="text" class="form-control" required
+                           [(ngModel)]="persona.nombres" ngControl="nombres" #nombres="ngModel">
+                    <div [hidden]="nombres.valid || nombres.untouched" class="alert alert-danger">
+                        Debe ingresar el nombre.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="apellidos">Apellido/s</label>
+                    <input id="apellidos" name="apellidos" type="text" class="form-control" required
+                           [(ngModel)]="persona.apellidos" ngControl="apellidos" #apellidos="ngModel">
+                    <div [hidden]="apellidos.valid || apellidos.untouched" class="alert alert-danger">
+                        Debe ingresar el apellido.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="documento">Nro. Documento</label>
+                    <input id="documento" name="documento" type="text" class="form-control" required
+                           [(ngModel)]="persona.doc.documento" ngControl="documento" #documento="ngModel">
+                    <div [hidden]="documento.valid || documento.untouched" class="alert alert-danger">
+                        Debe ingresar el numero de documento.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="org_documento_tipo_id">Tipo de Documento</label>
+                    <select id="org_documento_tipo_id" name="org_documento_tipo_id" class="form-control" required
+                            [(ngModel)]="tipoDocumentoSeleccionado" ngControl="org_documento_tipo_id" #org_documento_tipo_id="ngModel">
+                        <option *ngFor="let tipo of tipoDocumentos" [ngValue]="tipo">{{tipo.nombre}}</option>
+                    </select>
+                    <div [hidden]="org_documento_tipo_id.valid || org_documento_tipo_id.untouched" class="alert alert-danger">
+                        Debe ingresar el tipo de documento.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Fecha de Nacimiento</label>
+                    <my-date-picker
+                                    [options]="myDatePickerOptions"
+                                    (dateChanged)="onDateChanged($event)"
+                                    [selDate]="persona.fecha_de_nacimiento"
+                                    ></my-date-picker>
+                </div>
+            </div>
+        </div>
+
+        <template [ngIf]="dir.es_principal">
+            <legend class="text-info"><i class="fa fa-map-marker fa-fw"></i>&nbsp;Direcci&oacute;n Principal</legend>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <label for="direccion">Direcci&oacute;n</label>
+                        <input id="direccion" name="direccion" type="text" class="form-control"
+                               [(ngModel)]="dir.direccion" ngControl="direccion" [disabled]="!dir.es_principal">
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="numero">Nro. Casa/Dpto</label>
+                        <input id="numero" name="numero" type="text" class="form-control"
+                               [(ngModel)]="dir.numero" ngControl="numero" [disabled]="!dir.es_principal">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="descripcion">Descripci&oacute;n</label>
+                        <textarea id="descripcion" name="descripcion" class="form-control"
+                                  [ngModel]="dir.descripcion" ngControl="descripcion" [disabled]="!dir.es_principal"></textarea>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-info" type="submit" [disabled]="!crearPersonaForm.form.valid || persona.fecha_de_nacimiento == ''">Guardar</button>
+                <button class="btn btn-default" type="button" (click)="onCancel()">Cancelar</button>
+                <button type="button" class="btn btn-link" (click)="dir.es_principal = !dir.es_principal">
+                    <span *ngIf="!dir.es_principal">
+                        <i class="fa fa-map-marker fa-fw"></i>&nbsp;Agregar Direcci&oacute;n
+                    </span>
+                    <span *ngIf="dir.es_principal">
+                        <i class="fa fa-map-marker fa-fw"></i>&nbsp;Eliminar Direcci&oacute;n
+                    </span>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <template [ngIf]="verNotificacion">
+        <notifications [notification]="notificacion"
+                       (close)="closeNotification($event)"></notifications>
+    </template>
+</div>
