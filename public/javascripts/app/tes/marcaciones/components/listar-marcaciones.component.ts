@@ -54,23 +54,24 @@ export class ListarMarcacionesComponent implements OnInit {
     constructor(
         private _router: Router,
         private _authService: AuthService,
-        private _tarjetaService: MarcacionesService) { }
+        private _marcacionesService: MarcacionesService) { }
 
     ngOnInit() {
         this.notificacion = new Notification();
+        this.getUsuarios();
 
     }
 
-    // getSucursales() {
-    //     this._ventasService.getSucursales(this.org_organigrama_id)
-    //         .subscribe(
-    //             response => {
-    //                 this.marcaciones = response.rows;
-    //             },
-    //             err => console.log('ERROR: ' + err),
-    //             () => console.log('GET Sucursales Complete')
-    //         );
-    // }
+    getUsuarios() {
+        this._marcacionesService.getUsuarios()
+            .subscribe(
+                response => {
+                    this.marcaciones = response;
+                },
+                err => console.log('ERROR: ' + err),
+                () => console.log('GET Sucursales Complete')
+            );
+    }
 
     // gotoCrearBanco() {
     //     this._router.navigate(['CrearCajaComponent']);

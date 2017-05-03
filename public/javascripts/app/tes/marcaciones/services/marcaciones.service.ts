@@ -6,6 +6,11 @@ import 'rxjs/add/operator/map';
 export class MarcacionesService {
     constructor(private _http: Http) {}
 
+    getUsuarios() {
+            return this._http.get('/usuarios')
+                .map(res => { return res.json(); })
+    }
+
     getFacturasDisponibles(org_organigrama_id: number, nro = null) {
 
         if(!nro){
