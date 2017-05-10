@@ -1,6 +1,8 @@
 import {Injectable} from "@angular/core";
-import {Http, Headers} from '@angular/http';
+import {Http, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
+
+import {Marcacion, horasTrabajadas} from "../interfaces/marcacion.interface";
 
 @Injectable()
 export class MarcacionesService {
@@ -9,6 +11,32 @@ export class MarcacionesService {
     getUsuarios() {
             return this._http.get('/usuarios')
                 .map(res => { return res.json(); })
+    }
+    
+    gettimeworked(email:string, fecha:string) {
+            return this._http.get('/maxmarcacion/' +email+'/'+fecha)
+                .map(res => { return res.json(); })
+    }
+    
+  
+    deleteMarcaciones(id:number){
+       /* let headers = new Headers({ 'Content-Type': 'application/json' });
+       let options = new RequestOptions({ headers: headers });*/
+       return this._http.delete('/marcaciones/' + id.toString());
+    }
+  
+    sendDataMarcacion(mark: Marcacion){
+      var headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      let body = JSON.stringify(mark);
+      return this._http.post('/marcacion', body ,{ headers: headers });
+    }
+  
+    deleteUsuario(email:String){
+       //let headers = new Headers({ 'Content-Type': 'application/json' });
+      // let options = new RequestOptions({ headers: headers });
+       return this._http.delete('/usuarios/' + email/*, options*/)
+              .map(res => { return res.json(); })
     }
 
     getFacturasDisponibles(org_organigrama_id: number, nro = null) {

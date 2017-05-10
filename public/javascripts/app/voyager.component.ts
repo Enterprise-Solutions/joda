@@ -22,9 +22,8 @@ import {MiPerfilComponent} from "./menu/components/mi-perfil.component";
 })
 
 @RouteConfig([
-    { path: '/tes/...', name: 'MarcComponent', component: MarcComponent },
-    { path: '/perfil/', name: 'MiPerfilComponent', component: MiPerfilComponent }
-])
+    { path: '/marcaciones/...', name: 'MarcComponent', component: MarcComponent }
+  ])
 
 export class VoyagerComponent implements OnInit {
     public appName = 'Voyager';

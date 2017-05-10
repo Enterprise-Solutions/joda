@@ -1,0 +1,62 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-location-arrow fa-fw"></i>&nbsp;Consulta tiempo trabajado por fecha</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+        <div class="row">
+            <div class="form-group">
+				<form>
+					<div class="form-group">
+    					<label for="email">Identificacion, por email:</label>
+    					<input type="email" name="email" class="form-control" id="email" [(ngModel)]="email">
+  					</div>
+					<div class="form-group">
+    					<label for="fecha">En la fecha (dd-MM-yyyy):</label>
+    					<input type="text" name="fecha" class="form-control" id="fecha" [(ngModel)]="fecha">
+  					</div>
+  					<button type="submit" class="btn btn-success" (click)="tiempolaburado()" >Consultar</button>
+				</form>
+            </div>
+        </div>
+        
+         <div class="row">
+		    <template [ngIf]="labourtime">
+		        <div class="row">
+		            <div class="table-responsive">
+		                <table class="table table-bordered">
+		                    <thead>
+		                    <tr>
+		                        <th>Email</th>
+		                        <th>Fecha</th>
+		                        <th>Horas</th>
+		                        <th>Minutos</th>
+		                        <th>Segundos</th>
+		                    </tr>
+		                    </thead>
+		                        <tbody>
+		                            <tr *ngFor="let dato of labourtime">
+		                           		<td class="col-md-4 text-center">
+		                                    {{dato.email}}
+		                                </td>
+		                                <td class="col-md-4 text-center">
+		                                    {{dato.fecha}}
+		                                </td>
+		                                <td class="col-md-1 text-center">
+		                                    {{dato.horas}}
+		                                </td>
+		                                <td class="col-md-1 text-center">
+		                                    {{dato.minutos}}
+		                                </td>
+		                                <td class="col-md-1 text-center">
+		                                    {{dato.segundos}}
+		                                </td>
+		                            </tr>
+		                        </tbody>
+		                </table>
+		            </div>
+		        </div>
+		    </template>
+        </div>
+</div>

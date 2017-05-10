@@ -59,26 +59,35 @@ export class ListarMarcacionesComponent implements OnInit {
     ngOnInit() {
         this.notificacion = new Notification();
         this.getUsuarios();
+      
+      var test = this.getTest();
+      console.log('test es ' + test);
 
     }
+  
+  getTest(): String {
+    return "Hello world";
+  }
 
     getUsuarios() {
         this._marcacionesService.getUsuarios()
             .subscribe(
                 response => {
-                    this.marcaciones = response;
+                    this.marcaciones = response 
+                  console.log(JSON.stringify(response))
                 },
                 err => console.log('ERROR: ' + err),
                 () => console.log('GET Sucursales Complete')
             );
     }
-
-    // gotoCrearBanco() {
-    //     this._router.navigate(['CrearCajaComponent']);
-    // }
-    //
-    // gotoEditarCaja(caja_id) {
-    //     this._router.navigate(['EditarCajaComponent', {caja_id: caja_id}]);
-    // }
-
+  
+    eliminarUsuario(email: String){
+      console.log('Email: '+ email);
+        this._marcacionesService.deleteUsuario(email)
+          .subscribe(
+                result => console.log(result),
+                error => console.log('ERROR:' + error)
+        );
+      location.reload();
+    }
 }

@@ -1,0 +1,31 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-location-arrow fa-fw"></i>&nbsp;Nueva Marcacion</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+        <div class="row">
+            <div class="form-group">
+				<form>
+					<div class="form-group">
+    					<label for="email">Email address:</label>
+    					<input type="email" name="email" class="form-control" id="email" [value]="greeting" [(ngModel)]="user.email">
+  					</div>
+					<div class="form-group">
+    					<label for="apellido">Last Name:</label>
+    					<input type="text" name="apellido" class="form-control" id="apellido" [(ngModel)]="user.apellido">
+  					</div>
+					<div class="form-group">
+    					<label for="nombre">First Name:</label>
+    					<input type="text" name="nombre" class="form-control" id="nombre" [(ngModel)]="user.nombre">
+  					</div>
+					<div class="form-group">
+    					<label for="password">Password:</label>
+    					<input type="password" name="password" class="form-control" id="password" [(ngModel)]="user.password">
+  					</div>
+  					<button type="submit" class="btn btn-success" (click)="sendDatauser()" >Create User</button>
+				</form>
+            </div>
+        </div>
+</div>

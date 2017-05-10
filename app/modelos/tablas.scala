@@ -1,5 +1,6 @@
 package modelos
 import play.api.Play
+import java.util.Date
 import slick.driver.PostgresDriver.api._
 import java.sql.Timestamp
 
@@ -38,6 +39,23 @@ case class Lugar(
   long: Double
 )
 
+case class DatosCrearMarcacion(
+    usuario_id:Long,
+    lat:Double,
+    lng: Double,
+    fecha: Timestamp
+)
+
+case class DatosListadoMarcaciones(
+  nombreUser: String,
+  nombreLugar: String
+)
+
+case class DatosActualizarUsuario(
+  email: String,
+  nombre: String
+)
+
 class LugarT(tag: Tag) extends Table[Lugar](tag,"lugares"){
   def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
   def nombre = column[String]("nombre")
@@ -47,10 +65,39 @@ class LugarT(tag: Tag) extends Table[Lugar](tag,"lugares"){
   def * = (id,nombre,lat,long) <> (Lugar.tupled,Lugar.unapply)
 }
 
-case class MarcacionV1(
+case class Marcacion(
   id: Long,
   usuario_id: Long,
   lugar_id: Long,
   fecha: Timestamp
 )
 
+case class MarcacionR(
+  id: Long,
+  usuario_id: Long,
+  lugar_id: Long,
+  fecha: String
+)
+
+case class DatosResumenDiaTrabajado(
+    email:String,
+    fecha:String,
+    horas:Double,
+    minutos:Double,
+    segundos:Double
+)
+
+case class DatosCrearLugar(
+  nombre: String,
+  latitud: Double,
+  longitud: Double    
+)
+
+class MarcacionT(tag: Tag) extends Table[Marcacion](tag,"marcaciones"){
+  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
+  def usuario_id = column[Long]("usuario_id")
+  def lugar_id    = column[Long]("lugar_id")
+  def fecha  = column[Timestamp]("fecha")
+  
+  def * = (id,usuario_id,lugar_id,fecha) <> (Marcacion.tupled,Marcacion.unapply)
+}

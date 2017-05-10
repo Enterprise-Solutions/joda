@@ -6,3 +6,12 @@ export class Marcacion {
         public nombre?: string,
         public password?: string) {}
 }
+
+export class horasTrabajadas{
+    constructor(
+        public email?:string,
+        public fecha?:string,
+        public horas?:number,
+        public minutos?:number,
+        public segundos?:number){}
+}

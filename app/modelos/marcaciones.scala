@@ -14,13 +14,6 @@ case class DatosUsuario(
   correo: String    
 )
 
-case class Marcacion(
-  id: Long,
-  usuario_id: Long,
-  fecha: Date,
-  lugar: String
-)
-
 case class DatosCrearUsuario(
   email: String,
   apellido: String,
@@ -63,7 +56,7 @@ object Marcaciones{
 	  formatOfDate.parse(fecha)
   }
   
-  def _createMarking(usuario_id: Long,lugar: String,fecha: Date): Try[Marcacion] = {
+ /* def _createMarking(usuario_id: Long,lugar: String,fecha: Date): Try[Marcacion] = {
     val m1 = Marcacion(marcaciones.length+1,usuario_id,fecha,lugar)
     marcaciones = marcaciones.:+(m1)
     /*Failure(new Exception("Error al insertertar en la base de datos"))*/Success(m1)
@@ -74,7 +67,7 @@ object Marcaciones{
      user <- findUsuario(email)
      mark <- _createMarking(user.id, lugar, toDate(fecha))
     }yield(mark)
-  }
+  }*/
   
   def listingMarks(email:String, fecha: String): Seq[Marcacion] = {
     val fechaToDate = toDate(fecha)

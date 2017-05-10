@@ -15,5 +15,13 @@ GET		/usuarios/email/:email/nombre/:nombre		    controllers.UsuariosController.g
 POST	/usuarios					controllers.UsuariosController.crearUsuario()
 DELETE	/usuarios/:email			controllers.UsuariosController.borrar(email)
 
+DELETE	/marcaciones/:user_id		controllers.MarcacionesController.borrartodo(user_id:Long)
+GET		/marcaciones				controllers.MarcacionesController.listado()
+
+GET		/marcaciones				controllers.MarcacionesController.listado()
+
+DELETE	/lugares/:nombre			controllers.LugaresController.borrar(nombre)
+
+GET		/maxmarcacion/:email/:fecha				controllers.UsuariosController.marcacionMax(email:String, fecha:String)
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
