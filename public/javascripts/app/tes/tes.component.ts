@@ -4,9 +4,9 @@ import {RouteConfig, RouterOutlet, ROUTER_DIRECTIVES, RouterLink} from '@angular
 import {MenuService} from '../menu/services/menu.service';
 
 import {TesHomeComponent} from './tes-home.component';
-import {MarcacionesComponent} from "./marcaciones/marcaciones.component";
-import {CrearUsuarioComponent} from './marcaciones/components/crear_nuevousuario.component';
-import {HorasLaburadasComponent} from './marcaciones/components/horas_trabajadas.component';
+import {MarcacionesComponent} from "./usuarios/marcaciones.component";
+import {CrearUsuarioComponent} from './usuarios/components/crear_nuevousuario.component';
+import {HorasLaburadasComponent} from './usuarios/components/horas_trabajadas.component';
 
 import {CasoUso} from '../menu/interface/caso-uso.interface';
 
@@ -21,7 +21,7 @@ import {CasoUso} from '../menu/interface/caso-uso.interface';
 							<li>
                   <a [routerLink]="['MarcacionesComponent']">
                       <i class="fa fa-location-arrow fa-fw"></i>
-                      Ver de Marcaciones
+                      Ver lista de Usuarios
                   </a>
                   <a [routerLink]="['CrearUsuarioComponent']">
                       <i class="fa fa-location-arrow fa-fw"></i>

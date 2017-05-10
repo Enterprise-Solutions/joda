@@ -22,7 +22,7 @@ import {MiPerfilComponent} from "./menu/components/mi-perfil.component";
 })
 
 @RouteConfig([
-    { path: '/marcaciones/...', name: 'MarcComponent', component: MarcComponent }
+    { path: '/usuarios/...', name: 'MarcComponent', component: MarcComponent }
   ])
 
 export class VoyagerComponent implements OnInit {

@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 
 import {AuthService} from "../auth/services/auth.service";
-import {MarcacionesService} from "./marcaciones/services/marcaciones.service";
+import {MarcacionesService} from "./usuarios/services/marcaciones.service";
 
-import {Marcacion} from './marcaciones/interfaces/marcacion.interface';
+import {Marcacion} from './usuarios/interfaces/marcacion.interface';
 
 @Component({
     providers: [AuthService, MarcacionesService],
