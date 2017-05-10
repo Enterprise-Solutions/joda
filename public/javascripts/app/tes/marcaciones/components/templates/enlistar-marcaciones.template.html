@@ -1,0 +1,40 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-location-arrow fa-fw"></i>&nbsp;Listado de Marcaciones</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <template [ngIf]="marcaciones">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Email</th>
+                        <th>Fecha</th>
+                    </tr>
+                    </thead>
+                        <tbody>
+                            <tr *ngFor="let dato of marcaciones">
+                                <td class="col-md-2 text-center">
+                                    {{dato.nombre}}
+                                </td>
+                                <td class="col-md-2 text-center">
+                                    {{dato.apellido}}
+                                </td>
+                                <td class="col-md-4 text-center">
+                                    {{dato.email}}
+                                </td>
+                                <td class="col-md-3 text-center">
+                                    {{dato.fecha}}
+                                </td>
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+</div>

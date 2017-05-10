@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {RouteConfig, RouterOutlet, ROUTER_DIRECTIVES, RouterLink} from '@angular/router-deprecated';
 
-import {ListarMarcacionesComponent} from './components/listar-marcaciones.component';
+import {ListarMarcacionesComponent} from './components/listar-usuarios.component';
 import {CrearUsuarioComponent} from './components/crear_nuevousuario.component';
 import {HorasLaburadasComponent} from './components/horas_trabajadas.component';
 @Component({
@@ -16,4 +16,4 @@ import {HorasLaburadasComponent} from './components/horas_trabajadas.component';
     
 ])
 
-export class MarcacionesComponent { }
+export class UserviewComponent { }

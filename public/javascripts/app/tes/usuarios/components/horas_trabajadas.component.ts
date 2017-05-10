@@ -4,11 +4,11 @@ import {AuthService} from '../../../auth/services/auth.service';
 
 import {NotificationComponent} from '../../../utils/notification/components/notification.component';
 import {Notification} from '../../../utils/notification/interfaces/notification.interface';
-import {horasTrabajadas} from "../interfaces/marcacion.interface";
-import {MarcacionesService} from "../services/marcaciones.service";
+import {horasTrabajadas} from "../interfaces/usuarios.interface";
+import {UserService} from "../services/usuarios.service";
 
 @Component({
-    providers: [MarcacionesService],
+    providers: [UserService],
     directives: [NotificationComponent, ROUTER_DIRECTIVES],
     template: require('./templates/horastrabajadas.template.html'),
     styles: [`
@@ -24,9 +24,10 @@ export class HorasLaburadasComponent /*implements OnInit*/ { // no implementa On
     public email: string;
     public fecha: string;
     public labourtime:horasTrabajadas[];
+
     //@Input()  usuarios: Usuario;
     constructor(
-        private _userMarcaciones: MarcacionesService) { }
+        private _userMarcaciones: UserService) { }
   
   /*ngOnInit(){
     this.user = new Usuario()

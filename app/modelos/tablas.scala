@@ -79,6 +79,13 @@ case class MarcacionR(
   fecha: String
 )
 
+case class ListadoMarcaciones(
+    nombre: String,
+    apellido: String,
+    email: String,
+    fecha: String
+)
+
 case class DatosResumenDiaTrabajado(
     email:String,
     fecha:String,
@@ -100,4 +107,14 @@ class MarcacionT(tag: Tag) extends Table[Marcacion](tag,"marcaciones"){
   def fecha  = column[Timestamp]("fecha")
   
   def * = (id,usuario_id,lugar_id,fecha) <> (Marcacion.tupled,Marcacion.unapply)
+}
+
+
+class MarcacionRT(tag: Tag) extends Table[MarcacionR](tag,"marcacionesr"){
+  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
+  def usuario_id = column[Long]("usuario_id")
+  def lugar_id    = column[Long]("lugar_id")
+  def fecha  = column[String]("fecha")
+  
+  def * = (id,usuario_id,lugar_id,fecha) <> (MarcacionR.tupled,MarcacionR.unapply)
 }

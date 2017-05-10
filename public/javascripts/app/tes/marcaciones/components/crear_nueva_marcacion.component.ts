@@ -4,11 +4,11 @@ import {AuthService} from '../../../auth/services/auth.service';
 
 import {NotificationComponent} from '../../../utils/notification/components/notification.component';
 import {Notification} from '../../../utils/notification/interfaces/notification.interface';
-import {Marcacion} from "../interfaces/marcacion.interface";
-import {MarcacionesService} from "../services/marcaciones.service";
+import {Marcacion} from "../interfaces/marcaciones.interface";
+import {MarcacionService} from "../services/marcaciones.service";
 
 @Component({
-    providers: [MarcacionesService],
+    providers: [MarcacionService],
     directives: [NotificationComponent, ROUTER_DIRECTIVES],
     template: require('./templates/nuevamarcacion.template.html'),
     styles: [`
@@ -25,19 +25,19 @@ export class CrearMarcacionComponent /*implements OnInit*/ { // no implementa On
   
     //@Input()  usuarios: Usuario;
     constructor(
-        private _userMarcaciones: MarcacionesService) { }
+        private _userMarcaciones: MarcacionService) { }
   
   /*ngOnInit(){
     this.user = new Usuario()
   }*/
-    sendDatauser() {
+    sendDatammarcacion() {
         this._userMarcaciones.sendDataMarcacion(this.mark)
             .subscribe(
                 response => {
                   console.log(JSON.stringify(response))
                 },
                 err => console.log('ERROR: ' + err),
-                () => console.log('Crear usuario')
+                () => console.log('Crear marcacion')
             );
     }
     show(a :string){

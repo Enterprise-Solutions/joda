@@ -17,8 +17,7 @@ DELETE	/usuarios/:email			controllers.UsuariosController.borrar(email)
 
 DELETE	/marcaciones/:user_id		controllers.MarcacionesController.borrartodo(user_id:Long)
 GET		/marcaciones				controllers.MarcacionesController.listado()
-
-GET		/marcaciones				controllers.MarcacionesController.listado()
+#GET		/marcaciones				controllers.MarcacionesController.index()
 
 DELETE	/lugares/:nombre			controllers.LugaresController.borrar(nombre)
 

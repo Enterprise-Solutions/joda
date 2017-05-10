@@ -8,7 +8,8 @@ import {RouteConfig, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 // Importar los Modulos del Sistema (incluido MENU)
 import {MenuComponent} from './menu/components/menu.component';
 
-import {MarcComponent} from './tes/tes.component';
+import {UsuariosComponent} from './tes/tes.component';
+import {MarKComponent} from './tes/tes-marcaciones.component';
 
 import {AuthService} from './auth/services/auth.service';
 import { MODAL_DIRECTIVES } from './utils/ng2-bs3-modal/ng2-bs3-modal';
@@ -22,7 +23,8 @@ import {MiPerfilComponent} from "./menu/components/mi-perfil.component";
 })
 
 @RouteConfig([
-    { path: '/usuarios/...', name: 'MarcComponent', component: MarcComponent }
+    { path: '/usuarios/...', name: 'UsuariosComponent', component: UsuariosComponent },
+    { path: '/marcaciones/...', name: 'MarKComponent', component: MarKComponent}
   ])
 
 export class VoyagerComponent implements OnInit {

@@ -4,13 +4,13 @@ import {AuthService} from '../../../auth/services/auth.service';
 
 import {NotificationComponent} from '../../../utils/notification/components/notification.component';
 import {Notification} from '../../../utils/notification/interfaces/notification.interface';
-import {Marcacion} from "../interfaces/marcacion.interface";
-import {MarcacionesService} from "../services/marcaciones.service";
+import {UsuarioL} from "../interfaces/usuarios.interface";
+import {UserService} from "../services/usuarios.service";
 
 @Component({
-    providers: [MarcacionesService],
+    providers: [UserService],
     directives: [NotificationComponent, ROUTER_DIRECTIVES],
-    template: require('./templates/listar-marcaciones.template.html'),
+    template: require('./templates/listar-usuarios.template.html'),
     styles: [`
         .table > tbody > tr > td {
             vertical-align: middle;
@@ -22,7 +22,7 @@ export class ListarMarcacionesComponent implements OnInit {
     public org_organigrama_id: number;
     public loadingData: boolean;
 
-    public marcaciones: Marcacion[];
+    public usuarios: UsuarioL[];
     //public sucursales: Sucursal[];
 
     public numResults: number;
@@ -54,7 +54,7 @@ export class ListarMarcacionesComponent implements OnInit {
     constructor(
         private _router: Router,
         private _authService: AuthService,
-        private _marcacionesService: MarcacionesService) { }
+        private _usersService: UserService) { }
 
     ngOnInit() {
         this.notificacion = new Notification();
@@ -70,10 +70,10 @@ export class ListarMarcacionesComponent implements OnInit {
   }
 
     getUsuarios() {
-        this._marcacionesService.getUsuarios()
+        this._usersService.getUsuarios()
             .subscribe(
                 response => {
-                    this.marcaciones = response 
+                    this.usuarios = response 
                   console.log(JSON.stringify(response))
                 },
                 err => console.log('ERROR: ' + err),
@@ -83,7 +83,7 @@ export class ListarMarcacionesComponent implements OnInit {
   
     eliminarUsuario(email: String){
       console.log('Email: '+ email);
-        this._marcacionesService.deleteUsuario(email)
+        this._usersService.deleteUsuario(email)
           .subscribe(
                 result => console.log(result),
                 error => console.log('ERROR:' + error)

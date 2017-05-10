@@ -10,6 +10,7 @@ import modelos.Marcacion
 import modelos.DatosUsuario
 import modelos.DatosCrearUsuario*/
 import play.api.libs.json.JsError
+//import modelos.Marcacion
 import scala.util.Success
 import scala.util.Failure
 import services.Marcaciones
@@ -20,6 +21,8 @@ import scala.concurrent.Future
 @Singleton
 class MarcacionesController @Inject() (marcaciones: Marcaciones,implicit val ec: ExecutionContext) extends Controller {
   
+   implicit val listadomarcacionesJsonFormatter = Json.format[ListadoMarcaciones]
+   implicit val marcacionesJsonFormatter = Json.format[MarcacionR]
    implicit val marcacionlistadoJsonFormatter = Json.format[DatosListadoMarcaciones]
    //implicit val datosUsuarioJsonFormatter1 = Json.format[DatosUsuario]
    //implicit val datosCrearUsuarioFormatter = Json.format[DatosCrearUsuario]
@@ -32,17 +35,17 @@ class MarcacionesController @Inject() (marcaciones: Marcaciones,implicit val ec:
           }
   }
   
-   /*def editarMarcacion(user_id: Long) = Action.async{request => 
-    marcaciones.borrarlasmarcaciones(user_id) map{ r =>
-      Ok(r)
-    }recover {
-            case e: Exception => BadRequest(e.getMessage)
-          }
-  }*/
+  def index() = Action.async{request =>
+    marcaciones() map { r =>
+       Ok(Json.toJson(r))
+     } recover {
+      case e: Exception => BadRequest(e.getMessage)
+    }
+   }
   
   def listado() = Action.async{request => 
     marcaciones.listadoMarcaciones() map{ r =>
-      Ok(Json.toJson(r.toMap))
+      Ok(Json.toJson(r))
     }recover {
             case e: Exception => BadRequest(e.getMessage)
           }

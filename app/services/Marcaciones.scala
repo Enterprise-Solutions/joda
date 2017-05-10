@@ -5,7 +5,10 @@ import javax.inject.{Inject,Named}
 import scala.concurrent.{ExecutionContext,Future}
 import slick.driver.PostgresDriver
 import modelos.Marcacion
+import modelos.MarcacionR
+import modelos.ListadoMarcaciones
 import modelos.MarcacionT
+import modelos.MarcacionRT
 import modelos.LugarT
 import modelos.Lugar
 import modelos.Usuario
@@ -13,29 +16,23 @@ import modelos.UsuarioT
 import modelos.DatosListadoMarcaciones
 import modelos.DatosCrearMarcacion
 import java.sql.Timestamp
-//import com.github.maxpsq.googlemaps._
+import java.text.SimpleDateFormat
 
 
 class Marcaciones @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
   val marcaciones = TableQuery[MarcacionT]
+  val marcacionesr = TableQuery[MarcacionRT]
   val usuarios = TableQuery[UsuarioT]
   val lugares = TableQuery[LugarT]
-  
- /* def Marcaciones() {
-    this.dbConfigProvider = dbConfigProvider
-    this.ec = ec
-}*///Constructor?...
- //object Marcaciones{ //tira problemas con db y DBIO data type...
-  
-  /*def nuevaMarcacion(d:DatosCrearMarcacion):Future[Marcacion] = {
-    db.run(
-        crearNuevaMarcacion(d).transactionally)
+
+    def apply() = {
+    db.run(_action)
   }
   
-  def crearNuevaMarcacion(d:DatosCrearMarcacion): DBIO[Marcacion] = {
-    
-  }*/
+    def _action: DBIO[Seq[MarcacionR]] = {
+    marcacionesr.result
+  }
   
   def borrarlasmarcaciones(usuario_id: Long):Future[String] = {
     db.run(
@@ -68,14 +65,29 @@ class Marcaciones @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
      }yield(r)
     }
    
-   def listadoMarcaciones(): Future[Seq[(String,String)]]={
+   def listadoMarcaciones(): Future[Seq[ListadoMarcaciones]]={
      db.run(listadoijMarcaciones())
    }
    
-   def listadoijMarcaciones():DBIO[Seq[(String,String)]] = {
-     (for{
-       (uNombre,lNombre) <- ((marcaciones join usuarios on (_.usuario_id === _.id)) join lugares on (_._1.lugar_id === _.id)).map{case ((marks,users),places) => (users.nombre,places.nombre)} 
-     }yield(uNombre,lNombre)).result
+   def listadoijMarcaciones():DBIO[Seq[ListadoMarcaciones]] = {
+      val formatOfDate = new SimpleDateFormat("dd-MM-yyyy")
+      val query = sql""" SELECT
+                u.nombre,
+                u.apellido,
+                u.email,
+                m.fecha::DATE
+          FROM
+          	marcaciones m
+          	join usuarios u on (m.usuario_id = u.id)
+          GROUP BY u.id, fecha::DATE;"""
+     for{
+        r <- query.as[(String,String,String,Timestamp)]
+        r1 <- DBIO.successful{
+          r map { case (nombre,apellido,email,fecha) =>
+            ListadoMarcaciones(nombre,apellido,email,formatOfDate.format(fecha))
+          }
+        }
+     }yield(r1)
    }
    
 }

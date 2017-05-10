@@ -7,7 +7,8 @@ import {UsuariosService} from "../../adm/usuarios/services/usuarios.service";
 import {Perfil} from "../../adm/usuarios/interfaces/perfil.interface";
 import {Modulo} from "../interface/modulo.interface";
 import {MiPerfilComponent} from "./mi-perfil.component";
-import {MarcComponent} from "../../tes/tes.component";
+import {UsuariosComponent} from "../../tes/tes.component";
+import {MarKComponent} from "../../tes/tes-marcaciones.component";
 
 @Component({
 	selector: 'app-menu',

@@ -21,7 +21,7 @@
     <!--</template>-->
 
     <!--<template [ngIf]="numResults > 0 && !loadingData">-->
-    <template [ngIf]="marcaciones">
+    <template [ngIf]="usuarios">
         <div class="row">
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -35,7 +35,7 @@
                     </tr>
                     </thead>
                         <tbody>
-                            <tr *ngFor="let dato of marcaciones">
+                            <tr *ngFor="let dato of usuarios">
                                 <td class="col-md-2 text-center">
                                     {{dato.nombre}}
                                 </td>
@@ -59,16 +59,5 @@
             </div>
         </div>
 		
-    </template>
-
-    <template [ngIf]="loadingData">
-        <div class="col-md-12 text-center text-darkblue">
-            <i class="fa fa-refresh fa-spin fa-4x"></i>
-        </div>
-    </template>
-
-    <template [ngIf]="verNotificacion">
-        <notifications [notification]="notificacion"
-                       (close)="closeNotification($event)"></notifications>
     </template>
 </div>

@@ -4,7 +4,7 @@ import {RouteConfig, RouterOutlet, ROUTER_DIRECTIVES, RouterLink} from '@angular
 import {MenuService} from '../menu/services/menu.service';
 
 import {TesHomeComponent} from './tes-home.component';
-import {MarcacionesComponent} from "./usuarios/marcaciones.component";
+import {UserviewComponent} from "./usuarios/userviewcomponent";
 import {CrearUsuarioComponent} from './usuarios/components/crear_nuevousuario.component';
 import {HorasLaburadasComponent} from './usuarios/components/horas_trabajadas.component';
 
@@ -19,7 +19,7 @@ import {CasoUso} from '../menu/interface/caso-uso.interface';
 				<div class="col-md-2">
 					<ul class="nav nav-pills nav-stacked">
 							<li>
-                  <a [routerLink]="['MarcacionesComponent']">
+                  <a [routerLink]="['UserviewComponent']">
                       <i class="fa fa-location-arrow fa-fw"></i>
                       Ver lista de Usuarios
                   </a>
@@ -45,12 +45,12 @@ import {CasoUso} from '../menu/interface/caso-uso.interface';
 })
 
 @RouteConfig([
-  { path: '/marcaciones/...', name: 'MarcacionesComponent', component: MarcacionesComponent, useAsDefault: true},
+  { path: '/usuarios/...', name: 'UserviewComponent', component: UserviewComponent, useAsDefault: true},
   { path : '/crearusuario', name: 'CrearUsuarioComponent', component: CrearUsuarioComponent},
   { path : '/horastrabajadas', name: 'HorasLaburadasComponent', component: HorasLaburadasComponent}
 ])
 
-export class MarcComponent implements OnInit {
+export class UsuariosComponent implements OnInit {
   public cusHabilitados = [];
   public selectedCu: CasoUso;
 
