@@ -40,8 +40,4 @@ export class CrearUsuarioComponent /*implements OnInit*/ { // no implementa OnIn
                 () => console.log('Crear usuario')
             );
     }
-    show(a :string){
-      console.log(a);
-    }
-  
 }

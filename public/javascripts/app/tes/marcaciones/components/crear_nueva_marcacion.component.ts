@@ -10,7 +10,7 @@ import {MarcacionService} from "../services/marcaciones.service";
 @Component({
     providers: [MarcacionService],
     directives: [NotificationComponent, ROUTER_DIRECTIVES],
-    template: require('./templates/nuevamarcacion.template.html'),
+    template: require('./templates/nueva_marcacion.template.html'),
     styles: [`
         .table > tbody > tr > td {
             vertical-align: middle;
@@ -18,9 +18,7 @@ import {MarcacionService} from "../services/marcaciones.service";
     `]
 })
 
-export class CrearMarcacionComponent /*implements OnInit*/ { // no implementa OnInit porque debe esperar
-  //el boton de submit data...
-    //public greeting : string = "example@gmail.com";
+export class CrearMarcacionComponent /*implements OnInit*/ { 
     public mark = new Marcacion();
   
     //@Input()  usuarios: Usuario;
@@ -30,7 +28,7 @@ export class CrearMarcacionComponent /*implements OnInit*/ { // no implementa On
   /*ngOnInit(){
     this.user = new Usuario()
   }*/
-    sendDatammarcacion() {
+    sendDataDialings() {
         this._userMarcaciones.sendDataMarcacion(this.mark)
             .subscribe(
                 response => {
@@ -40,8 +38,4 @@ export class CrearMarcacionComponent /*implements OnInit*/ { // no implementa On
                 () => console.log('Crear marcacion')
             );
     }
-    show(a :string){
-      console.log(a);
-    }
-  
 }

@@ -21,7 +21,7 @@ import scala.math._
 
 //import services.Marcaciones
 
-class Usuarios @Inject() (val a: Marcaciones, protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
+class Usuarios @Inject() (val marc: Marcaciones, protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
   val usuarios = TableQuery[UsuarioT]
   val marcaciones = TableQuery[MarcacionT]
@@ -131,12 +131,10 @@ class Usuarios @Inject() (val a: Marcaciones, protected val dbConfigProvider: Da
   
   def _borrarUsuario(u:Usuario) = {
     for{
-      m <- a.borrarMarcacion(u.id)// Retorna DBIO action...
+      m <- marc.borrarMarcacion(u.id)// Retorna DBIO action...
       /*
       eliminar todas las marcaciones del usuario para poder realmente borrarlo...
-      */
-      //The simplest combinator is DBIO.seq
-      //For getting the results of all, use DBIO.sequence.
+      y si no tiene marcaciones????*/
       r <- usuarios.filter(_.email === u.email).delete
       _ <- r match{
         case 1 => DBIO.successful("")

@@ -22,15 +22,12 @@ export class UserService {
                 .map(res => { return res.json(); })
     }
       
-          
     gettimeworked(email:string, fecha:string) {
             return this._http.get('/maxmarcacion/' +email+'/'+fecha)
                 .map(res => { return res.json(); })
     }
   
     deleteMarcaciones(id:number){
-       /* let headers = new Headers({ 'Content-Type': 'application/json' });
-       let options = new RequestOptions({ headers: headers });*/
        return this._http.delete('/marcaciones/' + id.toString());
     }
       
@@ -42,9 +39,7 @@ export class UserService {
     }
   
     deleteUsuario(email:String){
-       //let headers = new Headers({ 'Content-Type': 'application/json' });
-      // let options = new RequestOptions({ headers: headers });
-       return this._http.delete('/usuarios/' + email/*, options*/)
+       return this._http.delete('/usuarios/' + email)
               .map(res => { return res.json(); })
     }
  }

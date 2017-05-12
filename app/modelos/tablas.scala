@@ -41,9 +41,7 @@ case class Lugar(
 
 case class DatosCrearMarcacion(
     usuario_id:Long,
-    lat:Double,
-    lng: Double,
-    fecha: Timestamp
+    lugar_id:Long
 )
 
 case class DatosListadoMarcaciones(
@@ -83,7 +81,10 @@ case class ListadoMarcaciones(
     nombre: String,
     apellido: String,
     email: String,
-    fecha: String
+    fecha: String,
+    cant: Int,
+    maxd: String,
+    mind: String
 )
 
 case class DatosResumenDiaTrabajado(

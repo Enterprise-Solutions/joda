@@ -21,6 +21,8 @@ import java.text.SimpleDateFormat
 import play.api.libs.json._
 import org.joda.time.format._
 import org.joda.time._
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 
 
@@ -112,10 +114,6 @@ class UsuariosController @Inject() (usuarios: Usuarios,implicit val ec: Executio
          Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> JsError.toJson(errores))))
         },
         d => { 
-          /*Marcaciones.agregarUsuario(d.email, d.apellido, d.nombre, d.password) match{
-            case Success(u) => Ok(Json.toJson(u))
-            case Failure(e) => BadRequest(e.getMessage)  
-          }*/
           usuarios.crear(d) map{ u =>
             Ok(Json.toJson(u))
           }recover {

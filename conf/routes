@@ -20,6 +20,7 @@ GET		/marcaciones				controllers.MarcacionesController.listado()
 #GET		/marcaciones				controllers.MarcacionesController.index()
 
 DELETE	/lugares/:nombre			controllers.LugaresController.borrar(nombre)
+POST	/marcaciones				controllers.MarcacionesController.crearMarcacion()
 
 GET		/maxmarcacion/:email/:fecha				controllers.UsuariosController.marcacionMax(email:String, fecha:String)
 # Map static resources from the /public folder to the /assets URL path

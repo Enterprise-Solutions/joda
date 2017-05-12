@@ -9,22 +9,14 @@
             <div class="form-group">
 				<form>
 					<div class="form-group">
-    					<label for="email">Email address:</label>
-    					<input type="email" name="email" class="form-control" id="email" [value]="greeting" [(ngModel)]="user.email">
+    					<label for="email">Identificador de Usuario:</label>
+    					<input type="number" name="usuario_id" class="form-control" id="usuario_id" [(ngModel)]="mark.usuario_id">
   					</div>
 					<div class="form-group">
-    					<label for="apellido">Last Name:</label>
-    					<input type="text" name="apellido" class="form-control" id="apellido" [(ngModel)]="user.apellido">
+    					<label for="apellido">Identificador de Lugar:</label>
+    					<input type="number" name="lugar_id" class="form-control" id="lugar_id" [(ngModel)]="mark.lugar_id">
   					</div>
-					<div class="form-group">
-    					<label for="nombre">First Name:</label>
-    					<input type="text" name="nombre" class="form-control" id="nombre" [(ngModel)]="user.nombre">
-  					</div>
-					<div class="form-group">
-    					<label for="password">Password:</label>
-    					<input type="password" name="password" class="form-control" id="password" [(ngModel)]="user.password">
-  					</div>
-  					<button type="submit" class="btn btn-success" (click)="sendDatauser()" >Create User</button>
+  					<button type="submit" class="btn btn-success" (click)="sendDataDialings()" >Create Dialing</button>
 				</form>
             </div>
         </div>

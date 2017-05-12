@@ -18,8 +18,9 @@ export class MarcacionService {
       var headers = new Headers();
       headers.append('Content-Type', 'application/json');
       let body = JSON.stringify(mark);
+      console.log("Este es el body:")
       console.log(body);
-      return this._http.post('/marcacion', body ,{ headers: headers });
+      return this._http.post('/marcaciones', body ,{ headers: headers });
     }
   
  }

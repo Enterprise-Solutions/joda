@@ -27,15 +27,19 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Email</th>
-                        <th>Password</th>
-                        <th>Eliminar</th>
+                    	<th class="text-center">ID</th>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Apellido</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Password</th>
+                        <th class="text-center">Eliminar</th>
                     </tr>
                     </thead>
                         <tbody>
                             <tr *ngFor="let dato of usuarios">
+                            <td class="col-md-1 text-center">
+                                    {{dato.id}}
+                                </td>
                                 <td class="col-md-2 text-center">
                                     {{dato.nombre}}
                                 </td>

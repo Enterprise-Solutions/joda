@@ -5,6 +5,7 @@ import {MenuService} from '../menu/services/menu.service';
 
 import {TesHomeComponent} from './tes-home.component';
 import {ListarMarcComponent} from './marcaciones/components/enlistar_marcaciones.component';
+import {CrearMarcacionComponent} from './marcaciones/components/crear_nueva_marcacion.component';
 
 import {CasoUso} from '../menu/interface/caso-uso.interface';
 
@@ -21,6 +22,10 @@ import {CasoUso} from '../menu/interface/caso-uso.interface';
                       <i class="fa fa-location-arrow fa-fw"></i>
                       Ver lista de Marcaciones
                   </a>
+                  <a [routerLink]="['NewMarcComponent']">
+                      <i class="fa fa-location-arrow fa-fw"></i>
+                      Agregar nueva Marcacion
+                  </a>
               </li>         
           </ul>
         </div>
@@ -35,7 +40,8 @@ import {CasoUso} from '../menu/interface/caso-uso.interface';
 })
 
 @RouteConfig([
-  { path : '/lista', name: 'ListarMarcComponent', component: ListarMarcComponent, useAsDefault: true}
+  { path : '/lista', name: 'ListarMarcComponent', component: ListarMarcComponent, useAsDefault: true},
+  { path : '/nueva' , name: 'NewMarcComponent' , component: CrearMarcacionComponent}
 ])
 
 export class MarKComponent implements OnInit {
