@@ -9,6 +9,8 @@ import {Modulo} from "../interface/modulo.interface";
 import {MiPerfilComponent} from "./mi-perfil.component";
 import {UsuariosComponent} from "../../tes/tes.component";
 import {MarKComponent} from "../../tes/tes-marcaciones.component";
+import {LugarComponent} from "../../tes/tes-lugares.component";
+
 
 @Component({
 	selector: 'app-menu',

@@ -1,0 +1,38 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-location-arrow fa-fw"></i>&nbsp;Listado de Lugares</li>
+    </ol>
+</section>
+<div class="container-fluid">
+    <template [ngIf]="lugares">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                    	<th class="text-center">ID</th>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Latitud</th>
+                        <th class="text-center">Longitud</th>
+                    </tr>
+                    </thead>
+                        <tbody>
+                            <tr *ngFor="let dato of lugares">
+                            <td class="col-md-1 text-center">
+                                    {{dato.id}}
+                                </td>
+                                <td class="col-md-2 text-center">
+                                    {{dato.nombre}}
+                                </td>
+                                <td class="col-md-2 text-center">
+                                    {{dato.lat}}
+                                </td>
+                                <td class="col-md-2 text-center">
+                                    {{dato.long}}
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+</div>

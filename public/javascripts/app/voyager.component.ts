@@ -10,6 +10,7 @@ import {MenuComponent} from './menu/components/menu.component';
 
 import {UsuariosComponent} from './tes/tes.component';
 import {MarKComponent} from './tes/tes-marcaciones.component';
+import {LugarComponent} from './tes/tes-lugares.component';
 
 import {AuthService} from './auth/services/auth.service';
 import { MODAL_DIRECTIVES } from './utils/ng2-bs3-modal/ng2-bs3-modal';
@@ -24,7 +25,8 @@ import {MiPerfilComponent} from "./menu/components/mi-perfil.component";
 
 @RouteConfig([
     { path: '/usuarios/...', name: 'UsuariosComponent', component: UsuariosComponent },
-    { path: '/marcaciones/...', name: 'MarKComponent', component: MarKComponent}
+    { path: '/marcaciones/...', name: 'MarKComponent', component: MarKComponent},
+    { path: '/lugares/...', name: 'LugarComponent' , component: LugarComponent}
   ])
 
 export class VoyagerComponent implements OnInit {
