@@ -52,8 +52,6 @@ export class ListarLugaresComponent implements OnInit {
     }];
 
     constructor(
-        private _router: Router,
-        private _authService: AuthService,
         private _placesService: LugarService) { }
 
     ngOnInit() {
@@ -74,13 +72,13 @@ export class ListarLugaresComponent implements OnInit {
             );
     }
   
-//    eliminarLugares(email: String){
-//      console.log('Email: '+ email);
-//        this._placesService.deleteLugar(email)
-//          .subscribe(
-//                result => console.log(result),
-//                error => console.log('ERROR:' + error)
-//        );
-//      location.reload();
-//    }
+   eliminarLugares(nombre: string){
+     console.log('Nombre del lugar: '+ nombre);
+       this._placesService.deleteLugar(nombre)
+         .subscribe(
+               result => console.log(result),
+               error => console.log('ERROR:' + error)
+       );
+     location.reload();
+   }
 }

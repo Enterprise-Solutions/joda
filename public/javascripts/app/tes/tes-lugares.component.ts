@@ -5,6 +5,8 @@ import {MenuService} from '../menu/services/menu.service';
 
 import {TesHomeComponent} from './tes-home.component';
 import {ListarLugaresComponent} from './lugares/components/listar_lugares.component';
+import {NuevoLugarComponent} from './lugares/components/nuevo_lugar.component';
+
 //import {CrearMarcacionComponent} from './marcaciones/components/crear_nueva_marcacion.component';
 
 import {CasoUso} from '../menu/interface/caso-uso.interface';
@@ -22,6 +24,10 @@ import {CasoUso} from '../menu/interface/caso-uso.interface';
                       <i class="fa fa-location-arrow fa-fw"></i>
                       Ver lista de Lugares
                   </a>
+                  <a [routerLink]="['NuevoLugarComponent']">
+                      <i class="fa fa-location-arrow fa-fw"></i>
+                      Agregar Lugar
+                  </a>
               </li>         
           </ul>
         </div>
@@ -36,7 +42,9 @@ import {CasoUso} from '../menu/interface/caso-uso.interface';
 })
 
 @RouteConfig([
-  { path : '/lista', name: 'ListarLugaresComponent', component: ListarLugaresComponent, useAsDefault: true}
+    {path : '/lista', name: 'ListarLugaresComponent', component: ListarLugaresComponent, useAsDefault: true},
+    {path : '/nuevo', name: 'NuevoLugarComponent', component: NuevoLugarComponent}
+
 ])
 
 export class LugarComponent implements OnInit {

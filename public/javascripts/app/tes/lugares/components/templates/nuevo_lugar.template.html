@@ -1,0 +1,28 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-address-book fa-fw"></i>&nbsp;Nuevo Lugar</li>
+    </ol>
+</section>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="form-group">
+            <form>
+                <div class="form-group">
+                    <label for="nombre">Nombre Lugar:</label>
+                    <input type="text" name="nombre" class="form-control" id="nombre"  [(ngModel)]="place.nombre">
+                </div>
+                <div class="form-group">
+                    <label for="latitud">Latitud:</label>
+                    <input type="number" step="any" name="latitud" class="form-control" id="latitud" [(ngModel)]="place.latitud">
+                </div>
+                <div class="form-group">
+                    <label for="longitud">Logitud:</label>
+                    <input type="number" step="any" name="longitud" class="form-control" id="longitud" [(ngModel)]="place.longitud">
+                </div>
+
+                <button type="submit" class="btn btn-success" (click)="getdataNewPlace()" >Crear Lugar</button>
+            </form>
+        </div>
+    </div>
+</div>

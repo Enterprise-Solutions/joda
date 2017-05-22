@@ -14,11 +14,12 @@
                         <th class="text-center">Nombre</th>
                         <th class="text-center">Latitud</th>
                         <th class="text-center">Longitud</th>
+                        <th class="text-center">Eliminar</th>
                     </tr>
                     </thead>
                         <tbody>
                             <tr *ngFor="let dato of lugares">
-                            <td class="col-md-1 text-center">
+                                <td class="col-md-1 text-center">
                                     {{dato.id}}
                                 </td>
                                 <td class="col-md-2 text-center">
@@ -29,6 +30,12 @@
                                 </td>
                                 <td class="col-md-2 text-center">
                                     {{dato.long}}
+                                </td>
+                                <td class="col-md-1 text-center">
+                                    <a class="text-danger" (click)="eliminarLugares(dato.nombre)" style="cursor: pointer;">
+                                        <i class="fa fa-remove fa-fw"></i>
+                                    </a>
+                                </td>
                             </tr>
                         </tbody>
                 </table>

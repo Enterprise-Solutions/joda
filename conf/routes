@@ -21,6 +21,8 @@ GET		/marcaciones				controllers.MarcacionesController.listado()
 
 DELETE	/lugares/:nombre			controllers.LugaresController.borrar(nombre)
 GET 	/lugares					controllers.LugaresController.index()
+POST	/lugares					controllers.LugaresController.crearLugar()
+
 POST	/marcaciones				controllers.MarcacionesController.crearMarcacion()
 
 GET		/maxmarcacion/:email/:fecha				controllers.UsuariosController.marcacionMax(email:String, fecha:String)
