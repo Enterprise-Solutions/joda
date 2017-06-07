@@ -9,22 +9,16 @@ GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 
-GET     /usuarios					controllers.UsuariosController.index()
-GET		/usuarios/email/:email/nombre/:nombre		    controllers.UsuariosController.get(email:String,nombre: String)
 
-POST	/usuarios					controllers.UsuariosController.crearUsuario()
-DELETE	/usuarios/:email			controllers.UsuariosController.borrar(email)
+GET		/login/:usuario/:password		controllers.UsuariosController.loginUser(usuario:String,password:String)
 
-DELETE	/marcaciones/:user_id		controllers.MarcacionesController.borrartodo(user_id:Long)
-GET		/marcaciones				controllers.MarcacionesController.listado()
-#GET		/marcaciones				controllers.MarcacionesController.index()
+#POST	/login							controllers.UsuariosController.loginUserP()
 
-DELETE	/lugares/:nombre			controllers.LugaresController.borrar(nombre)
-GET 	/lugares					controllers.LugaresController.index()
-POST	/lugares					controllers.LugaresController.crearLugar()
+POST	/login						controllers.UsuariosController.loginUserF()
 
-POST	/marcaciones				controllers.MarcacionesController.crearMarcacion()
+POST	/lugares					controllers.UsuariosController.marcacionesLugares()
 
-GET		/maxmarcacion/:email/:fecha				controllers.UsuariosController.marcacionMax(email:String, fecha:String)
+POST	/marcar						controllers.UsuariosController.crearNuevaMarcacion()
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

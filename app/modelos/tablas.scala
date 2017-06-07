@@ -1,121 +1,299 @@
 package modelos
+
 import play.api.Play
-import java.util.Date
+import play.api.data.format.Formats._ 
 import slick.driver.PostgresDriver.api._
 import java.sql.Timestamp
+import play.api.data.Form
+import play.api.data.Forms.{mapping, text, of}
+import play.api.data.format.Formats.doubleFormat
+import play.api.libs.json.{__, Reads, Writes}
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Json
+import java.sql.Date
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
 
 case class Usuario(
-  id: Long,
-  email: String,
-  apellido: String,
-  nombre: String,
-  password: String
-  //marcaciones: Seq[Marcacion] = Seq[Marcacion]()
-){
-  def nombre_completo = {
-    val Nombre = nombre.toUpperCase()
-    s" $Nombre ${apellido.toUpperCase()}"
-  }
-  
-  def _toDatosUsuario = {
-    DatosUsuario(email)
-  }
-}
-
-class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
-  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def email = column[String]("email")
-  def apellido = column[String]("apellido")
-  def nombre   = column[String]("nombre")
-  def password = column[String]("password")
-  
-  def * = (id,email,apellido,nombre,password) <> (Usuario.tupled,Usuario.unapply)
-}
-
-case class Lugar(
-  id: Long,
-  nombre: String,
-  lat: Double,
-  long: Double
+ id: Long,
+ nombre: Option[String],
+ apellido: Option[String],
+ documento: Option[String],
+ email: Option[String],
+ usuario:String,
+ password: String,
+ uid:String,
+ activo:Boolean,
+ web_login:Boolean,
+ empresas_id: Long
 )
 
-case class DatosCrearMarcacion(
-    usuario_id:Long,
-    lugar_id:Long
+case class Lugar( // tabla en la BD
+ id: Long,
+ nombre: Option[String],
+ uid:Option[String],
+ latitud: Double,
+ longitud: Double,
+ es_beacon: Boolean,
+ direccion:Option[String],
+ cliente_id: Option[Long],
+ empresa_id: Long
 )
 
-case class DatosListadoMarcaciones(
-  nombreUser: String,
-  nombreLugar: String
-)
 
-case class DatosActualizarUsuario(
-  email: String,
-  nombre: String
+case class LugarR( // JSON que se pasa como Respuesta...
+ id: Long,
+ nombre: Option[String],
+ latitud: String,
+ longitud: String,
+ direccion:Option[String],
+ empresa_id: Long,
+ cliente_id: Option[Long],
+ uid:Option[String],
+ es_beacon:Boolean,
+ tipo_marcacion: Long
 )
-
-class LugarT(tag: Tag) extends Table[Lugar](tag,"lugares"){
-  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def nombre = column[String]("nombre")
-  def lat    = column[Double]("lat")
-  def long   = column[Double]("long")
-  
-  def * = (id,nombre,lat,long) <> (Lugar.tupled,Lugar.unapply)
-}
 
 case class Marcacion(
-  id: Long,
-  usuario_id: Long,
-  lugar_id: Long,
-  fecha: Timestamp
+ usuario_id: Long,
+ lugar_id: Long,
+ fecha: Date,
+ hora_entrada: Option[Timestamp],
+ es_valido: Boolean,
+ id: Long,
+ hora_salida: Option[Timestamp],
+ latitud_entrada: Option[Double],
+ longitud_entrada: Option[Double],
+ latitud_salida: Option[Double],
+ longitud_salida: Option[Double]
 )
 
 case class MarcacionR(
-  id: Long,
-  usuario_id: Long,
-  lugar_id: Long,
+ usuario_id: Long,
+ lugar_id: Long,
+ fecha: String,
+ hora_entrada: Option[String],
+ es_valido: Boolean,
+ id: Long,
+ hora_salida: Option[String],
+ latitud_entrada: Option[String],
+ longitud_entrada: Option[String],
+ latitud_salida: Option[String],
+ longitud_salida: Option[String]
+)
+
+class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
+  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
+  def nombre   = column[Option[String]]("nombre") // it could be null...
+  def apellido = column[Option[String]]("apellido")
+  def documento = column[Option[String]]("documento")
+  def email = column[Option[String]]("email")
+  def usuario   = column[String]("usuario")
+  def password = column[String]("password")
+  def uid = column[String]("uid")
+  def activo= column[Boolean]("activo")
+  def web_login = column[Boolean]("web_login")
+  def empresas_id= column[Long]("empresas_id")
+  
+  def * = (id,nombre,apellido,documento,email,usuario,password,uid,activo,web_login,empresas_id) <> (Usuario.tupled,Usuario.unapply)
+}
+
+class LugarT (tag: Tag) extends Table[Lugar](tag,"lugares"){
+  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
+  def nombre = column[Option[String]]("nombre")
+  def uid = column[Option[String]]("uid")
+  def latitud = column[Double]("latitud")
+  def longitud = column[Double]("longitud")
+  def es_beacon= column[Boolean]("es_beacon")
+  def direccion   = column[Option[String]]("direccion")
+  def cliente_id = column[Option[Long]]("cliente_id")
+  def empresa_id= column[Long]("empresa_id")
+  
+  def * = (id,nombre,uid,latitud,longitud,es_beacon,direccion,cliente_id,empresa_id) <> (Lugar.tupled,Lugar.unapply)
+}
+
+class MarcacionT (tag: Tag) extends Table[Marcacion](tag,"marcaciones"){
+  def usuario_id = column[Long]("usuario_id")
+  def lugar_id = column[Long]("lugar_id")
+  def fecha = column[Date] ("fecha")
+  def hora_entrada   = column[Option[Timestamp]]("hora_entrada")
+  def es_valido= column[Boolean]("es_valido")
+  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
+  def hora_salida   = column[Option[Timestamp]]("hora_salida")
+  def latitud_entrada = column[Option[Double]]("latitud_entrada")
+  def longitud_entrada = column[Option[Double]]("longitud_entrada")
+  def latitud_salida = column[Option[Double]]("latitud_salida")
+  def longitud_salida = column[Option[Double]]("longitud_salida")
+  
+  def * = (usuario_id,lugar_id,fecha,hora_entrada,es_valido,id,hora_salida,latitud_entrada,longitud_entrada,latitud_salida,longitud_salida) <> (Marcacion.tupled,Marcacion.unapply)
+}
+
+// Inputs...
+
+//Login
+case class DatosLoginUser(
+    usuario:String,
+    password:String
+)
+
+object DatosLoginUser {
+  val loginForm = Form(
+        mapping(
+    "usuario" -> text,
+    "password" -> text
+    )(DatosLoginUser.apply)(DatosLoginUser.unapply)
+  )
+  
+  implicit val readsPerson: Reads[DatosLoginUser] = (
+    ((__ \ "usuario").read[String]) and
+    ((__ \ "password").read[String])
+  )(DatosLoginUser.apply _)  
+
+  implicit val writesItem = Writes[DatosLoginUser] {
+    case DatosLoginUser(usuario, password) =>
+      Json.obj(
+        "usuario" -> usuario,
+        "password" -> password
+      )
+  }
+}
+
+//Consulta Marcacion...
+case class DatosLugaresMarcaciones(
+  uid: String,
   fecha: String
 )
 
-case class ListadoMarcaciones(
-    nombre: String,
-    apellido: String,
-    email: String,
-    fecha: String,
-    cant: Int,
-    maxd: String,
-    mind: String
-)
+object DatosLugaresMarcaciones {
+  val loginForm = Form(
+        mapping(
+    "uid" -> text,
+    "fecha" -> text
+    )(DatosLugaresMarcaciones.apply)(DatosLugaresMarcaciones.unapply)
+  )
+  
+  implicit val readsPerson: Reads[DatosLugaresMarcaciones] = (
+    ((__ \ "uid").read[String]) and
+    ((__ \ "fecha").read[String])
+  )(DatosLugaresMarcaciones.apply _)  
 
-case class DatosResumenDiaTrabajado(
-    email:String,
-    fecha:String,
-    horas:Double,
-    minutos:Double,
-    segundos:Double
-)
+  implicit val writesItem = Writes[DatosLugaresMarcaciones] {
+    case DatosLugaresMarcaciones(uid, fecha) =>
+      Json.obj(
+        "uid" -> uid,
+        "fecha" -> fecha
+      )
+  }
+}
 
-case class DatosCrearLugar(
-  nombre: String,
+//Crear Marcacion...
+case class crearMarcacion(
+  uid: String,
+  hora: String,
+  lugar_id: Long,
   latitud: Double,
-  longitud: Double    
+  longitud: Double
 )
 
-class MarcacionT(tag: Tag) extends Table[Marcacion](tag,"marcaciones"){
-  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def usuario_id = column[Long]("usuario_id")
-  def lugar_id    = column[Long]("lugar_id")
-  def fecha  = column[Timestamp]("fecha")
+object DatosCrearMarcacion {
+  val crearMarcacionForm = Form(
+        mapping(
+    "uid" -> text,
+    "hora" -> text,
+    "lugar_id" -> of[Long],
+    "latitud" -> of[Double],
+    "longitud" -> of[Double]
+    )(crearMarcacion.apply)(crearMarcacion.unapply)
+  )
   
-  def * = (id,usuario_id,lugar_id,fecha) <> (Marcacion.tupled,Marcacion.unapply)
+  implicit val readsPerson: Reads[crearMarcacion] = (
+    ((__ \ "uid").read[String]) and
+    ((__ \ "hora").read[String]) and
+    ((__ \ "lugar_id").read[Long]) and
+    ((__ \ "latitud").read[Double]) and 
+    ((__ \ "longitud").read[Double])
+  )(crearMarcacion.apply _)  
+
+  implicit val writesItem = Writes[crearMarcacion] {
+    case crearMarcacion(uid, hora, lugar_id, latitud, longitud) =>
+      Json.obj(
+        "uid" -> uid,
+        "hora" -> hora,
+        "lugar_id" -> lugar_id,
+        "latitud" -> latitud,
+        "longitud" -> longitud
+      )
+  }
 }
 
+// Respuestas...
 
-class MarcacionRT(tag: Tag) extends Table[MarcacionR](tag,"marcacionesr"){
-  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def usuario_id = column[Long]("usuario_id")
-  def lugar_id    = column[Long]("lugar_id")
-  def fecha  = column[String]("fecha")
-  
-  def * = (id,usuario_id,lugar_id,fecha) <> (MarcacionR.tupled,MarcacionR.unapply)
-}
+//Login
+case class LoginUser(
+  error: Boolean,
+  error_msg: Option[String],
+  uid: Option[String],
+  user: Option[user_data] = None
+)
+
+case class user_data(
+  nombre:String,
+  email:String
+)
+
+case class Marcaje(
+    Marcacion: MarcacionR
+)
+
+//Consulta Marcacion...
+case class lugaresM(
+    Lugar: LugarR,
+    Marcaciones: Seq[Marcaje]
+)
+    
+case class marcacionesLugares(
+    error: Boolean,
+    error_msg: Option[String],
+    lugares: Option[Seq[lugaresM]]
+)
+
+//Crear Marcacion...
+
+case class marcacionRealizada(
+    error: Boolean,
+    mensaje: Option[String],
+    error_msg: Option[String]
+)
+
+case class distance (
+    text:String,
+    value:Long
+)
+
+case class duration (
+    text:String,
+    value:Long
+)
+
+case class datosGoogleApi(
+    distance:distance,
+    duration:duration,
+    status:String
+)
+
+case class elementosGoogleApi(
+    elements:Seq[datosGoogleApi]
+)
+
+
+case class googleApiDistance(
+    destination_addresses:Seq[String],
+    origin_addresses:Seq[String],
+    rows:Seq[elementosGoogleApi],
+    status:String
+)
+
+
+
+

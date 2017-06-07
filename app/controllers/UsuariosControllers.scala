@@ -4,117 +4,114 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 import modelos._
-import play.api.libs.json.Json
-/*import modelos.Usuario
-import modelos.Marcacion
-import modelos.DatosUsuario
-import modelos.DatosCrearUsuario*/
-import play.api.libs.json.JsError
 import scala.util.Success
 import scala.util.Failure
-import scala.util.Try
 import services.Usuarios
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import play.api.libs.json._
-import org.joda.time.format._
-import org.joda.time._
+import services.Login
+import services.Marcaciones
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-
-
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
  */
-
 @Singleton
-class UsuariosController @Inject() (usuarios: Usuarios,implicit val ec: ExecutionContext) extends Controller {
+class UsuariosController @Inject() (usuarios: Usuarios,login: Login, marcaciones: Marcaciones,implicit val ec: ExecutionContext) extends Controller {
   
-   implicit val marcacionJsonFormatter = Json.format[MarcacionR]
-   /*implicit val implicitTimestampFormatter = new Writes[Marcacion] {
-    def writes(foo: Marcacion): JsValue = {
-      Json.obj(
-        "id" -> foo.id,
-        "usuario_id" -> foo.usuario_id,
-        "lugar_id" -> foo.lugar_id,
-        "fecha" -> foo.fecha.toString()
-      )
-    }
-  }*/
-   implicit val resumenJsonFormatter = Json.format[DatosResumenDiaTrabajado]
-   implicit val usuarioJsonFormatter = Json.format[Usuario]
-   implicit val datosUsuarioJsonFormatter1 = Json.format[DatosUsuario]
-   implicit val datosCrearUsuarioFormatter = Json.format[DatosCrearUsuario]
-   implicit val datosActualizarUsuarioFormatter = Json.format[DatosActualizarUsuario]
-   //implicit val dateTimestampFormatter = Json.format[Seq[Marcacion]]
-   
-   def index() = Action.async{request =>
-     usuarios() map { r =>
+  implicit val crearMarcacionJsonFormatter = Json.format[crearMarcacion]
+  implicit val userdataJsonFormatter = Json.format[user_data]
+  implicit val usuariologinJsonFormatter = Json.format[LoginUser]
+  implicit val datosloginJsonFormatter = Json.format[DatosLoginUser]
+  implicit val datoslugaresmarcacionesJsonFormatter= Json.format[DatosLugaresMarcaciones]
+  implicit val lugarJsonFormatter = Json.format[Lugar]
+ 
+  
+  implicit val lugarRWJsonFormatter: Writes[LugarR] = (
+    (JsPath \ "id").write[Long] and
+    (JsPath \ "nombre").write[Option[String]] and
+    (JsPath \ "latitud").write[String] and
+    (JsPath \ "longitud").write[String] and
+    (JsPath \ "direccion").write[Option[String]] and
+    (JsPath \ "empresa_id").write[Long] and
+    (JsPath \ "cliente_id").write[Option[Long]] and
+    (JsPath \ "uid").write[Option[String]] and
+    (JsPath \ "es_beacon").write[Boolean] and
+    (JsPath \ "tipo_marcacion").write[Long]
+  )(unlift(LugarR.unapply))
+  
+  implicit val lugarRRJsonFormatter: Reads[LugarR] = (
+    (JsPath \ "id").read[Long] and
+    (JsPath \ "nombre").readNullable[String] and
+    (JsPath \ "latitud").read[String] and
+    (JsPath \ "longitud").read[String] and
+    (JsPath \ "direccion").readNullable[String] and
+    (JsPath \ "empresa_id").read[Long] and
+    (JsPath \ "cliente_id").readNullable[Long] and
+    (JsPath \ "uid").readNullable[String] and
+    (JsPath \ "es_beacon").read[Boolean] and
+    (JsPath \ "tipo_marcacion").read[Long]
+  )(LugarR.apply _)
+  
+    implicit val MarcacionRJsonFormatter: Writes[MarcacionR] = (
+    (JsPath \ "usuario_id").write[Long] and
+    (JsPath \ "lugar_id").write[Long] and
+    (JsPath \ "fecha").write[String] and
+    (JsPath \ "hora_entrada").write[Option[String]] and
+    (JsPath \ "es_valido").write[Boolean] and
+    (JsPath \ "id").write[Long] and
+    (JsPath \ "hora_salida").write[Option[String]] and
+    (JsPath \ "latitud_entrada").write[Option[String]] and
+    (JsPath \ "longitud_entrada").write[Option[String]] and
+    (JsPath \ "latitud_salida").write[Option[String]] and
+    (JsPath \ "longitud_salida").write[Option[String]]
+  )(unlift(MarcacionR.unapply))
+  
+  implicit val MarcacionRRJsonFormatter: Reads[MarcacionR] = (
+    (JsPath \ "usuario_id").read[Long] and
+    (JsPath \ "lugar_id").read[Long] and
+    (JsPath \ "fecha").read[String] and
+    (JsPath \ "hora_entrada").readNullable[String] and
+    (JsPath \ "es_valido").read[Boolean] and
+    (JsPath \ "id").read[Long] and
+    (JsPath \ "hora_salida").readNullable[String] and
+    (JsPath \ "latitud_entrada").readNullable[String] and
+    (JsPath \ "longitud_entrada").readNullable[String] and
+    (JsPath \ "latitud_salida").readNullable[String] and
+    (JsPath \ "longitud_salida").readNullable[String]
+  )(MarcacionR.apply _)
+  
+  
+  implicit val marcajeJsonFormatter = Json.format[Marcaje]
+  
+  implicit val seqMarcacionesLugaresJsonFormatter: Writes[lugaresM] = (
+    (JsPath \ "Lugar").write[LugarR] and
+    (JsPath \ "Marcaciones").write[Seq[Marcaje]]
+  )(unlift(lugaresM.unapply))
+  
+  implicit val seqMarcacionesWLugaresJsonFormatter = Json.format[lugaresM]
+  implicit val lugaresmarcadosJsonFormatter = Json.format[marcacionesLugares]
+  implicit val nuevaMarcacionJsonFormatter = Json.format[marcacionRealizada]
+  
+ 
+   def loginUser(usuario:String, password:String) = Action.async{request =>
+     login.login(usuario,password) map { r =>
        Ok(Json.toJson(r))
      } recover {
       case e: Exception => BadRequest(e.getMessage)
     }
    }
-
-  def get(email: String,nombre: String) = Action { request => 
-    Marcaciones.findUsuario(email) match{
-      case Success(u) => Ok(Json.toJson(u))
-      case Failure(e) => BadRequest(e.getMessage) 
-    }
-  }
   
-  def borrar(email: String) = Action.async{request => 
-    usuarios.borrar(email) map{ r =>
-      Ok(r)
-    }recover {
-            case e: Exception => BadRequest(e.getMessage)
-          }
-  }
-  
-  def marcacionMax(email: String, fecha: String) = Action.async{request =>
-    val formatOfDate = new SimpleDateFormat("dd-MM-yyyy")
-    val fmt = DateTimeFormat.forPattern("dd-MM-yyyy")
-    // Corroborar que el formato de fecha sea pasado correctamente...
-    val date = Try[DateTime](fmt.parseDateTime(fecha)) 
-    date match {
-      case Success(date) => usuarios.trabajadoUser(email, new Timestamp(formatOfDate.parse(fecha).getTime())) map{ r =>
-                          Ok(Json.toJson(r))
-                          }recover {
-                            case e: Exception => BadRequest(e.getMessage)
-                          }// ok
-      case Failure(exception) => Future(BadRequest(exception.getMessage))// not ok
-    }
-
-  }
-  
-  def editarUsuario() = Action.async(BodyParsers.parse.json) { request =>
-    val jsonResult = request.body.validate[DatosActualizarUsuario]
-    jsonResult.fold(
-        errores => {
-         Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> JsError.toJson(errores))))
-        },
-        d => {
-          usuarios.editarUser(d) map{ u =>
-            Ok(Json.toJson(u))
-          }recover {
-            case e: Exception => BadRequest(e.getMessage)
-          }
-        }
-    )
-  } 
-   
-  def crearUsuario() = Action.async(BodyParsers.parse.json) { request =>
-    val jsonResult = request.body.validate[DatosCrearUsuario]
+    def loginUserP() = Action.async(BodyParsers.parse.json) { request =>
+    val jsonResult = request.body.validate[DatosLoginUser]
     jsonResult.fold(
         errores => {
          Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> JsError.toJson(errores))))
         },
         d => { 
-          usuarios.crear(d) map{ u =>
+          login.loginU(d) map{ u =>
             Ok(Json.toJson(u))
           }recover {
             case e: Exception => BadRequest(e.getMessage)
@@ -122,4 +119,54 @@ class UsuariosController @Inject() (usuarios: Usuarios,implicit val ec: Executio
         }
     )
   } 
+    
+   def loginUserF() = Action.async { implicit request =>
+    val message = "Something go wrong !"
+    DatosLoginUser.loginForm.bindFromRequest().fold(
+         formWithErrors => {
+         Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
+        },
+          d => { 
+            login.loginU(d) map{ u =>
+              Ok(Json.toJson(u))
+            }recover {
+              case e: Exception => BadRequest(e.getMessage)
+            }
+          }
+        )
+  }
+   
+       
+  def marcacionesLugares() = Action.async { implicit request =>
+    val message = "Something go wrong !"
+    DatosLugaresMarcaciones.loginForm.bindFromRequest().fold(
+         formWithErrors => {
+         Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
+        },
+          d => { 
+            marcaciones.showMarcaciones(d) map{ u =>
+              Ok(Json.toJson(u))
+            }recover {
+              case e: Exception => BadRequest(e.getMessage)
+            }
+          }
+        )
+  }
+  
+    def crearNuevaMarcacion() = Action.async { implicit request =>
+    val message = "Something go wrong !"
+    DatosCrearMarcacion.crearMarcacionForm.bindFromRequest().fold(
+         formWithErrors => {
+         Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
+        },
+          d => { 
+            marcaciones.nuevaMarcacion(d) map{ u =>
+              Ok(Json.toJson(u))
+            }recover {
+              case e: Exception => BadRequest(e.getMessage)
+            }
+          }
+        )
+    }
+
 }
