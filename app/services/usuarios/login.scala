@@ -1,4 +1,4 @@
-package services
+package services.usuarios
 
 import play.api.db.slick.{DatabaseConfigProvider,HasDatabaseConfigProvider}
 import javax.inject.{Inject,Named}

@@ -165,7 +165,7 @@ case class DatosLugaresMarcaciones(
   fecha: String
 )
 
-object DatosLugaresMarcaciones {
+object Formulario {
   val loginForm = Form(
         mapping(
     "uid" -> text,
@@ -266,33 +266,10 @@ case class marcacionRealizada(
     error_msg: Option[String]
 )
 
-case class distance (
-    text:String,
-    value:Long
-)
+case class ExceptionJoda(msg:String, codigo:String) extends Exception(msg)
 
-case class duration (
-    text:String,
-    value:Long
-)
-
-case class datosGoogleApi(
-    distance:distance,
-    duration:duration,
-    status:String
-)
-
-case class elementosGoogleApi(
-    elements:Seq[datosGoogleApi]
-)
-
-
-case class googleApiDistance(
-    destination_addresses:Seq[String],
-    origin_addresses:Seq[String],
-    rows:Seq[elementosGoogleApi],
-    status:String
-)
+  
+    
 
 
 
