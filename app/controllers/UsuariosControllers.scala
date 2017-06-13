@@ -21,7 +21,7 @@ import scala.concurrent.Future
  */
 
 @Singleton
-class UsuariosController @Inject() (listarMarcacionPorLugares: marcacionesDeLugares,login: Login, nueva_marcacion: insertarMarcacion,implicit val ec: ExecutionContext) extends Controller {
+class UsuariosController @Inject() (login: Login, implicit val ec: ExecutionContext) extends Controller {
   
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]

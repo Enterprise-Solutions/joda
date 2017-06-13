@@ -17,27 +17,7 @@ class Login @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, i
   def loginU(d: DatosLoginUser): Future[LoginUser] = {
     db.run(loginUser(d).transactionally)
   }
-    
-   def loginUsuario(user:String, password: String):DBIO[LoginUser]={
-     val query = sql"""
-      SELECT uid, nombre, email
-      FROM usuarios 
-      WHERE usuario = $user AND 
-       password = $password;
-      """
-     for{
-        r <- query.as[(String,String,String)]
-        r1 <- DBIO.successful{r.toSeq.headOption}
-        r2 <- DBIO.successful{
-          r1 match { case Some((uid,nombre,email)) =>
-            LoginUser(false,None,Some(uid),Some(user_data(nombre,email)))
-          case None =>
-            LoginUser(true,Some("Usuario o contraseña incorrecta"),None,None)
-          }
-        }
-     }yield(r2)
-   }
-     
+         
    def loginUser(d: DatosLoginUser): DBIO[LoginUser] = {
     val user = d.usuario
     val password = d.password
@@ -58,10 +38,6 @@ class Login @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, i
           }
         }
      }yield(r2)
-  }
-  
-  def login(usuario: String, password: String): Future[LoginUser]={
-     db.run(loginUsuario(usuario,password))
   }
   
 }

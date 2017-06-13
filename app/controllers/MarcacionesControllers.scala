@@ -95,7 +95,7 @@ class MarcacionesControllers @Inject() (listarMarcacionPorLugares: marcacionesDe
        
   def marcacionesLugares() = Action.async { implicit request =>
     val message = "Something go wrong !"
-    Formulario.loginForm.bindFromRequest().fold(
+    Formulario.marcacionesUsuarioForm.bindFromRequest().fold(
          formWithErrors => {
          Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
         },

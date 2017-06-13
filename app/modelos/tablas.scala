@@ -166,7 +166,7 @@ case class DatosLugaresMarcaciones(
 )
 
 object Formulario {
-  val loginForm = Form(
+  val marcacionesUsuarioForm = Form(
         mapping(
     "uid" -> text,
     "fecha" -> text
@@ -207,7 +207,7 @@ object DatosCrearMarcacion {
     )(crearMarcacion.apply)(crearMarcacion.unapply)
   )
   
-  implicit val readsPerson: Reads[crearMarcacion] = (
+  implicit val readsPerson: Reads[crearMarcacion] = ( //conversion de json a otro tipo
     ((__ \ "uid").read[String]) and
     ((__ \ "hora").read[String]) and
     ((__ \ "lugar_id").read[Long]) and
@@ -215,7 +215,7 @@ object DatosCrearMarcacion {
     ((__ \ "longitud").read[Double])
   )(crearMarcacion.apply _)  
 
-  implicit val writesItem = Writes[crearMarcacion] {
+  implicit val writesItem = Writes[crearMarcacion] { //convierte un tipo a json
     case crearMarcacion(uid, hora, lugar_id, latitud, longitud) =>
       Json.obj(
         "uid" -> uid,

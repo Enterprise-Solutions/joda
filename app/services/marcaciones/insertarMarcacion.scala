@@ -45,18 +45,20 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
       val now = (Calendar.getInstance().getTime()).getTime()
       val timestamp = new Timestamp(now)
       val hourString = formatOfTime.format(timestamp)
+      var tipo = "entrada"
        for{
           u <- revisaUsuario(d) // usuario de la marcacion, si no existe retorna un Failure.
           l <- revisaLugar(d) // lugar de la marcacion, si no existe retorna un Failure.
           _ <- revisaDistancia(d,l.latitud,l.longitud) // revisa que la distancia sea menor a la permitida para marcar...
           pruebaActualizar <- updateMarcacion(d, u.id)
           mOp <- pruebaActualizar match{
-              case n if(n > 0) => DBIO.successful("") 
-              case 0 =>insertarMarcacion(d,u.id)
+              case n if(n > 0) => tipo = "salida"
+                                  DBIO.successful("")              
+              case 0 => insertarMarcacion(d,u.id)
               case _ => DBIO.failed(new Exception("Error al actualizar o insertar registro!"))
               
             }
-        }yield(marcacionRealizada(false,Some(s"Creaste entrada a las $hourString"),None))
+        }yield(marcacionRealizada(false,Some(s"Creaste ${tipo} a las $hourString"),None))
     }
     
     def _updateMarcacion(d: crearMarcacion,m: Marcacion) = {
@@ -131,7 +133,7 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
         us <- usuarios.filter(_.uid === d.uid).result
         l <- us.length match {
           case n if (n > 0) => DBIO.successful("")
-          case 0 => DBIO.failed(new Exception("No existe el usuario con uid ${d.uid}"))
+          case 0 => DBIO.failed(new Exception(s"No existe el usuario con uid ${d.uid}"))
           case _ => DBIO.failed(new Exception("Problemas al consultar con la base de datos"))
         }
       }yield(us.head)
