@@ -29,6 +29,20 @@ case class Usuario(
  empresas_id: Long
 )
 
+case class UsuarioJ( //Json que se pasa como respuesta
+ id: Long,
+ nombre: String,
+ apellido: String,
+ documento: String,
+ email: Option[String],
+ usuario:String,
+ password: String,
+ uid:String,
+ activo:Boolean,
+ web_login:Boolean,
+ empresas_id: Long
+)
+
 case class Lugar( // tabla en la BD
  id: Long,
  nombre: Option[String],
@@ -256,6 +270,12 @@ case class marcacionesLugares(
     error: Boolean,
     error_msg: Option[String],
     lugares: Option[Seq[lugaresM]]
+)
+
+case class listadoUsuarios(
+    error: Boolean,
+    error_msg: Option[String],
+    usuarios: Option[Seq[Usuario]]
 )
 
 //Crear Marcacion...

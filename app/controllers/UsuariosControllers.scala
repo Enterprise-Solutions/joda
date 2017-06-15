@@ -8,7 +8,7 @@ import Framework.Formatters
 import scala.util.Success
 import scala.util.Failure
 import services.usuarios.Login
-import services.marcaciones.insertarMarcacion
+import services.usuarios.Listar
 import services.marcaciones.marcacionesDeLugares
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -21,12 +21,14 @@ import scala.concurrent.Future
  */
 
 @Singleton
-class UsuariosController @Inject() (login: Login, implicit val ec: ExecutionContext) extends Controller {
+class UsuariosController @Inject() (listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
   
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]
   implicit val datosloginJsonFormatter = Json.format[DatosLoginUser]
-    
+  implicit val usuariosJsonFormatter = Json.format[Usuario]  
+  implicit val lugarJsonFormatter = Json.format[listadoUsuarios]
+      
   def loginUser() = Action.async { implicit request =>
    val message = "Something go wrong !"
    DatosLoginUser.loginForm.bindFromRequest().fold(
@@ -42,5 +44,21 @@ class UsuariosController @Inject() (login: Login, implicit val ec: ExecutionCont
          }
      )
  }
-
+  
+  def listar(email: Option[String]) = Action.async{request =>
+     listarUsuarios.listarU(email) map { r =>
+       Ok(Json.toJson(r))
+     } recover {
+      case e: Exception => BadRequest(e.getMessage)
+    }
+   }  
+  
+  def listarBusq(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int]) = Action.async{request =>
+     listarUsuarios.listarBusq(busqueda, pagina, cantidad) map { r =>
+       Ok(Json.toJson(r))
+     } recover {
+      case e: Exception => BadRequest(e.getMessage)
+    }
+   }  
 }
+
