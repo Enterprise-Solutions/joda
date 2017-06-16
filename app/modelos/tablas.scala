@@ -5,7 +5,7 @@ import play.api.data.format.Formats._
 import slick.driver.PostgresDriver.api._
 import java.sql.Timestamp
 import play.api.data.Form
-import play.api.data.Forms.{mapping, text, of}
+import play.api.data.Forms.{mapping, text, of, boolean}
 import play.api.data.format.Formats.doubleFormat
 import play.api.libs.json.{__, Reads, Writes}
 import play.api.libs.functional.syntax._
@@ -17,16 +17,15 @@ import play.api.libs.functional.syntax._
 
 case class Usuario(
  id: Long,
- nombre: Option[String],
- apellido: Option[String],
- documento: Option[String],
- email: Option[String],
+ nombre: String,
+ apellido: String,
+ documento: String,
+ email: String,
  usuario:String,
  password: String,
  uid:String,
  activo:Boolean,
- web_login:Boolean,
- empresas_id: Long
+ web_login:Boolean
 )
 
 case class UsuarioJ( //Json que se pasa como respuesta
@@ -39,8 +38,45 @@ case class UsuarioJ( //Json que se pasa como respuesta
  password: String,
  uid:String,
  activo:Boolean,
+ web_login:Boolean
+)
+
+//datos de un nuevo usuario a ser creado
+case class DatosNuevoUsuario(
+ nombre: String,
+ apellido: String,
+ documento: String,
+ email: String,
+ usuario:String,
+ password: String,
+ activo:Boolean,
+ web_login:Boolean
+)
+
+//Json de respuesta al crear nuevo usuario
+case class nuevoUsuario(
+    error: Boolean,
+    error_msg: Option[String],
+    usuario: Option[Usuario]
+)
+
+//datos a editar de un usuario
+case class DatosEditarUsuario(
+ nombre: String,
+ apellido: String,
+ documento: String,
+ email: String,
+ usuario:String,
+ activo:Boolean,
  web_login:Boolean,
- empresas_id: Long
+ uid: String
+)
+
+//Json de respuesta al editar datos del usuario
+case class edicionUsuario(
+    error: Boolean,
+    error_msg: Option[String],
+    usuario: Option[Usuario]
 )
 
 case class Lugar( // tabla en la BD
@@ -99,18 +135,17 @@ case class MarcacionR(
 
 class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
   def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def nombre   = column[Option[String]]("nombre") // it could be null...
-  def apellido = column[Option[String]]("apellido")
-  def documento = column[Option[String]]("documento")
-  def email = column[Option[String]]("email")
+  def nombre   = column[String]("nombre") // it could be null...
+  def apellido = column[String]("apellido")
+  def documento = column[String]("documento")
+  def email = column[String]("email")
   def usuario   = column[String]("usuario")
   def password = column[String]("password")
   def uid = column[String]("uid")
   def activo= column[Boolean]("activo")
   def web_login = column[Boolean]("web_login")
-  def empresas_id= column[Long]("empresas_id")
   
-  def * = (id,nombre,apellido,documento,email,usuario,password,uid,activo,web_login,empresas_id) <> (Usuario.tupled,Usuario.unapply)
+  def * = (id,nombre,apellido,documento,email,usuario,password,uid,activo,web_login) <> (Usuario.tupled,Usuario.unapply)
 }
 
 class LugarT (tag: Tag) extends Table[Lugar](tag,"lugares"){
@@ -159,7 +194,7 @@ object DatosLoginUser {
     )(DatosLoginUser.apply)(DatosLoginUser.unapply)
   )
   
-  implicit val readsPerson: Reads[DatosLoginUser] = (
+    implicit val readsPerson: Reads[DatosLoginUser] = (
     ((__ \ "usuario").read[String]) and
     ((__ \ "password").read[String])
   )(DatosLoginUser.apply _)  
@@ -169,6 +204,46 @@ object DatosLoginUser {
       Json.obj(
         "usuario" -> usuario,
         "password" -> password
+      )
+  } 
+}
+
+object DatosNuevoUsuario {
+  val datosNuevoUsuarioForm = Form(
+        mapping(
+    "nombre" -> text,
+    "apellido" -> text,
+    "documento" -> text,
+    "email" -> text,
+    "usuario" -> text,
+    "password" -> text,
+    "activo" -> boolean,
+    "web_login" -> boolean
+    )(DatosNuevoUsuario.apply)(DatosNuevoUsuario.unapply)
+  )
+  
+ implicit val readsPerson: Reads[DatosNuevoUsuario] = (
+    ((__ \ "nombre").read[String]) and
+    ((__ \ "apellido").read[String]) and
+    ((__ \ "documento").read[String]) and
+    ((__ \ "email").read[String]) and
+    ((__ \ "usuario").read[String]) and
+    ((__ \ "password").read[String]) and
+    ((__ \ "activo").read[Boolean]) and
+    ((__ \ "web_login").read[Boolean]) 
+  )(DatosNuevoUsuario.apply _)  
+
+  implicit val writesItem = Writes[DatosNuevoUsuario] {
+    case DatosNuevoUsuario(nombre, apellido, documento, email, usuario, password, activo, web_login) =>
+      Json.obj(
+        "nombre" -> nombre,
+        "apellido" -> apellido,
+        "documento" -> documento,
+        "email" -> email,
+        "usuario" -> usuario,
+        "password" -> password,
+        "activo" -> activo,
+        "web_login" -> web_login
       )
   }
 }
