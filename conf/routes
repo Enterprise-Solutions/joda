@@ -10,8 +10,7 @@ GET     /count                      controllers.CountController.count
 GET     /message                    controllers.AsyncController.message
 
 POST	/login						controllers.UsuariosController.loginUser()
-GET		/usuarios					controllers.UsuariosController.listar(email: Option[String])
-GET		/usuariosb					controllers.UsuariosController.listarBusq(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int])
+GET		/usuarios					controllers.UsuariosController.listar(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String])
 
 POST	/lugares					controllers.MarcacionesControllers.marcacionesLugares()
 

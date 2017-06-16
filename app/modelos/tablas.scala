@@ -275,7 +275,8 @@ case class marcacionesLugares(
 case class listadoUsuarios(
     error: Boolean,
     error_msg: Option[String],
-    usuarios: Option[Seq[Usuario]]
+    usuarios: Option[Seq[Usuario]],
+    total: Option[Int]
 )
 
 //Crear Marcacion...

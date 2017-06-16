@@ -44,17 +44,9 @@ class UsuariosController @Inject() (listarUsuarios: Listar, login: Login, implic
          }
      )
  }
-  
-  def listar(email: Option[String]) = Action.async{request =>
-     listarUsuarios.listarU(email) map { r =>
-       Ok(Json.toJson(r))
-     } recover {
-      case e: Exception => BadRequest(e.getMessage)
-    }
-   }  
-  
-  def listarBusq(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int]) = Action.async{request =>
-     listarUsuarios.listarBusq(busqueda, pagina, cantidad) map { r =>
+    
+  def listar(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String]) = Action.async{request =>
+     listarUsuarios.listar(busqueda, pagina, cantidad, ordenarPor, direccionOrd) map { r =>
        Ok(Json.toJson(r))
      } recover {
       case e: Exception => BadRequest(e.getMessage)
