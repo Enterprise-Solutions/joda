@@ -10,8 +10,8 @@ import scala.util.Failure
 import services.usuarios.Login
 import services.usuarios.Listar
 import services.usuarios.CrearUsuario
+import services.usuarios.EditarUsuario
 
-import services.marcaciones.marcacionesDeLugares
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
@@ -23,7 +23,7 @@ import scala.concurrent.Future
  */
 
 @Singleton
-class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
+class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
   
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]
@@ -32,6 +32,8 @@ class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: 
   implicit val lugarJsonFormatter = Json.format[listadoUsuarios]
   implicit val datosNuevoUsuarioJsonFormatter = Json.format[DatosNuevoUsuario]
   implicit val nuevoUsuarioJsonFormatter = Json.format[nuevoUsuario]
+  implicit val datosEditarUsuarioJsonFormatter = Json.format[DatosEditarUsuario]
+  implicit val editarUsuarioJsonFormatter = Json.format[edicionUsuario]
       
   def loginUser() = Action.async { implicit request =>
    val message = "Something go wrong !"
@@ -65,6 +67,22 @@ class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: 
        },
          d => { 
            nuevoUsuario.crearUsuario(d) map{ u =>
+             Ok(Json.toJson(u))
+           }recover {
+             case e: Exception => BadRequest(e.getMessage)
+           }
+         }
+     )
+ }  
+  
+  def editarUsuario() = Action.async { implicit request =>
+   val message = "Something go wrong !"
+   DatosEditarUsuariov.datosEditarUsuarioForm.bindFromRequest().fold(
+      formWithErrors => {
+        Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
+       },
+         d => { 
+           editar.editarUsuario(d) map{ u =>
              Ok(Json.toJson(u))
            }recover {
              case e: Exception => BadRequest(e.getMessage)

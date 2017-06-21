@@ -12,6 +12,7 @@ GET     /message                    controllers.AsyncController.message
 POST	/login						controllers.UsuariosController.loginUser()
 GET		/usuarios					controllers.UsuariosController.listar(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String])
 POST	/usuarios/crear				controllers.UsuariosController.crearUsuario()
+POST	/usuarios/editar			controllers.UsuariosController.editarUsuario()
 
 POST	/lugares					controllers.MarcacionesControllers.marcacionesLugares()
 
