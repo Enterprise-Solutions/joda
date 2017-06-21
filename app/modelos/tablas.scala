@@ -248,6 +248,46 @@ object DatosNuevoUsuario {
   }
 }
 
+object DatosEditarUsuariov {
+  val datosEditarUsuarioForm = Form(
+        mapping(
+    "nombre" -> text,
+    "apellido" -> text,
+    "documento" -> text,
+    "email" -> text,
+    "usuario" -> text,
+    "activo" -> boolean,
+    "web_login" -> boolean,
+    "uid" -> text
+    )(DatosEditarUsuario.apply)(DatosEditarUsuario.unapply)
+  )
+  
+ implicit val readsEditPerson: Reads[DatosEditarUsuario] = (
+    ((__ \ "nombre").read[String]) and
+    ((__ \ "apellido").read[String]) and
+    ((__ \ "documento").read[String]) and
+    ((__ \ "email").read[String]) and
+    ((__ \ "usuario").read[String]) and
+    ((__ \ "activo").read[Boolean]) and
+    ((__ \ "web_login").read[Boolean]) and
+    ((__ \ "uid").read[String])
+  )(DatosEditarUsuario.apply _)  
+
+  implicit val writesEditPerson = Writes[DatosEditarUsuario] {
+    case DatosEditarUsuario(nombre, apellido, documento, email, usuario, activo, web_login, uid) =>
+      Json.obj(
+        "nombre" -> nombre,
+        "apellido" -> apellido,
+        "documento" -> documento,
+        "email" -> email,
+        "usuario" -> usuario,
+        "activo" -> activo,
+        "web_login" -> web_login,
+        "uid" -> uid
+      )
+  }
+}
+
 //Consulta Marcacion...
 case class DatosLugaresMarcaciones(
   uid: String,

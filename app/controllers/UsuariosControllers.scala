@@ -13,6 +13,7 @@ import services.usuarios.CrearUsuario
 import io.swagger.converter.ModelConverters
 import io.swagger.annotations._
 import services.marcaciones.marcacionesDeLugares
+import services.usuarios.EditarUsuario
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
@@ -25,7 +26,8 @@ import scala.concurrent.Future
 
 @Singleton
 @Api(value = "Usuarios", description = "Operations about Users", consumes="application/x-www-form-urlencoded") 
-class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
+class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
+
   
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]
@@ -34,6 +36,7 @@ class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: 
   implicit val lugarJsonFormatter = Json.format[listadoUsuarios]
   implicit val datosNuevoUsuarioJsonFormatter = Json.format[DatosNuevoUsuario]
   implicit val nuevoUsuarioJsonFormatter = Json.format[nuevoUsuario]
+
   
   @ApiOperation(value = "loginUser",
      notes = "Permite Loguear un Usuario",
@@ -53,6 +56,9 @@ class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: 
         dataType = "string",
         paramType = "query")
   ))
+  implicit val datosEditarUsuarioJsonFormatter = Json.format[DatosEditarUsuario]
+  implicit val editarUsuarioJsonFormatter = Json.format[edicionUsuario]
+      
   def loginUser() = Action.async { implicit request =>
    val message = "Something go wrong !"
    DatosLoginUser.loginForm.bindFromRequest().fold(
@@ -85,7 +91,7 @@ class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: 
      notes = "Crea un usuario",
      response = classOf[modelos.nuevoUsuario],
      httpMethod = "POST")
-       @ApiImplicitParams(Array(
+     @ApiImplicitParams(Array(
       new ApiImplicitParam(
         name = "nombre",
         value = "User's name",
@@ -143,6 +149,75 @@ class UsuariosController @Inject() (nuevoUsuario: CrearUsuario, listarUsuarios: 
        },
          d => { 
            nuevoUsuario.crearUsuario(d) map{ u =>
+             Ok(Json.toJson(u))
+           }recover {
+             case e: Exception => BadRequest(e.getMessage)
+           }
+         }
+     )
+ }  
+  @ApiOperation(value = "editarUsuario",
+     notes = "Edita un usuario",
+     response = classOf[modelos.edicionUsuario],
+     httpMethod = "POST")
+    @ApiImplicitParams(Array(
+      new ApiImplicitParam(
+        name = "nombre",
+        value = "User's name",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "apellido",
+        value = "LastName",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "documento",
+        value = "document Number",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "email",
+        value = "Email",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "usuario",
+        value = "User id",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "uid",
+        value = "Password",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "activo",
+        value = "Still function?",
+        required = true,
+        dataType = "boolean",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "web_login",
+        value = "Can Loggin from web?",
+        required = true,
+        dataType = "boolean",
+        paramType = "query")
+  ))
+  def editarUsuario() = Action.async { implicit request =>
+   val message = "Something go wrong !"
+   DatosEditarUsuariov.datosEditarUsuarioForm.bindFromRequest().fold(
+      formWithErrors => {
+        Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
+       },
+         d => { 
+           editar.editarUsuario(d) map{ u =>
              Ok(Json.toJson(u))
            }recover {
              case e: Exception => BadRequest(e.getMessage)
