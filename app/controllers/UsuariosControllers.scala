@@ -14,11 +14,7 @@ import io.swagger.converter.ModelConverters
 import io.swagger.annotations._
 import services.marcaciones.marcacionesDeLugares
 import services.usuarios.EditarUsuario
-<<<<<<< HEAD
 import services.usuarios.EditarContrasenha
-
-=======
->>>>>>> 8d6846e9399470625a1f643f5154b083390e92bd
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
@@ -30,13 +26,8 @@ import scala.concurrent.Future
  */
 
 @Singleton
-<<<<<<< HEAD
+@Api(value = "Usuarios", description = "Operations about Users", consumes="application/x-www-form-urlencoded")
 class UsuariosController @Inject() (editContrasenha: EditarContrasenha, editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
-=======
-@Api(value = "Usuarios", description = "Operations about Users", consumes="application/x-www-form-urlencoded") 
-class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
-
->>>>>>> 8d6846e9399470625a1f643f5154b083390e92bd
   
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]
@@ -45,7 +36,10 @@ class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUs
   implicit val lugarJsonFormatter = Json.format[listadoUsuarios]
   implicit val datosNuevoUsuarioJsonFormatter = Json.format[DatosNuevoUsuario]
   implicit val nuevoUsuarioJsonFormatter = Json.format[nuevoUsuario]
-
+  implicit val datosEditarUsuarioJsonFormatter = Json.format[DatosEditarUsuario]
+  implicit val editarUsuarioJsonFormatter = Json.format[edicionUsuario]
+  implicit val datosEditarContrasenhaJsonFormatter = Json.format[DatosEditarContrasenha]
+  implicit val editarContrasenhaJsonFormatter = Json.format[edicionContrasenha]
   
   @ApiOperation(value = "loginUser",
      notes = "Permite Loguear un Usuario",
@@ -65,11 +59,6 @@ class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUs
         dataType = "string",
         paramType = "query")
   ))
-  implicit val datosEditarUsuarioJsonFormatter = Json.format[DatosEditarUsuario]
-  implicit val editarUsuarioJsonFormatter = Json.format[edicionUsuario]
-  implicit val datosEditarContrasenhaJsonFormatter = Json.format[DatosEditarContrasenha]
-  implicit val editarContrasenhaJsonFormatter = Json.format[edicionContrasenha]
-      
   def loginUser() = Action.async { implicit request =>
    val message = "Something go wrong !"
    DatosLoginUser.loginForm.bindFromRequest().fold(
@@ -237,6 +226,36 @@ class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUs
      )
  }
   
+  @ApiOperation(value = "editarContrasenha",
+     notes = "Edita la contrasenha de un usuario",
+     response = classOf[modelos.edicionContrasenha],
+     httpMethod = "POST")
+    @ApiImplicitParams(Array(
+      new ApiImplicitParam(
+        name = "uid",
+        value = "UID del usuario cuya contraseña se va cambiar",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "contrasenha_vieja",
+        value = "Contraseña actual del usuario",
+        required = false,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "contrasenha_nueva",
+        value = "Contraseña por la que se quiere cambiar",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "confirmacion_contrasenha_nueva",
+        value = "Repetición de la contraseña nueva",
+        required = true,
+        dataType = "string",
+        paramType = "query")
+  ))
   def editarContrasenha() = Action.async { implicit request =>
    val message = "Something go wrong !"
    DatosEditarContrasenha.datosEditarContrasenhaForm.bindFromRequest().fold(
