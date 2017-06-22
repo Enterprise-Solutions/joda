@@ -10,6 +10,8 @@ import scala.util.Failure
 import services.marcaciones.insertarMarcacion
 import services.marcaciones.marcacionesDeLugares
 import play.api.libs.json._
+import io.swagger.converter.ModelConverters
+import io.swagger.annotations._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -20,6 +22,7 @@ import scala.concurrent.Future
  */
 
 @Singleton
+@Api(value = "Marcaciones", description = "Operaciones con las marcaciones", consumes="application/x-www-form-urlencoded") 
 class MarcacionesControllers @Inject() (listarMarcacionPorLugares: marcacionesDeLugares, nueva_marcacion: insertarMarcacion,implicit val ec: ExecutionContext) extends Controller {
   
   implicit val crearMarcacionJsonFormatter = Json.format[crearMarcacion]
@@ -92,7 +95,25 @@ class MarcacionesControllers @Inject() (listarMarcacionPorLugares: marcacionesDe
   implicit val seqMarcacionesWLugaresJsonFormatter = Json.format[lugaresM]
   implicit val lugaresmarcadosJsonFormatter = Json.format[marcacionesLugares]
   implicit val nuevaMarcacionJsonFormatter = Json.format[marcacionRealizada]
-       
+   
+  @ApiOperation(value = "marcacionesLugares",
+     notes = "Muestra todos los lugares con las marcaciones del Usuario Ingresado",
+     response = classOf[modelos.marcacionesLugares],
+     httpMethod = "POST")
+   @ApiImplicitParams(Array(
+      new ApiImplicitParam(
+        name = "uid",
+        value = "user identification",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "fecha",
+        value = "Date",
+        required = true,
+        dataType = "string",
+        paramType = "query")
+  ))
   def marcacionesLugares() = Action.async { implicit request =>
     val message = "Something go wrong !"
     Formulario.marcacionesUsuarioForm.bindFromRequest().fold(
@@ -109,6 +130,42 @@ class MarcacionesControllers @Inject() (listarMarcacionPorLugares: marcacionesDe
     )
   }
   
+    @ApiOperation(value = "crearNuevaMarcacion",
+     notes = "Crea nueva marcacion",
+     response = classOf[modelos.crearMarcacion],
+     httpMethod = "POST")
+    @ApiImplicitParams(Array(
+      new ApiImplicitParam(
+        name = "uid",
+        value = "User identificacion",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "hora",
+        value = "Date",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "lugar_id",
+        value = "Place identifier",
+        required = true,
+        dataType = "long",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "latitud",
+        value = "Latitud of Place",
+        required = true,
+        dataType = "double",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "longitud",
+        value = "Longitud of Place",
+        required = true,
+        dataType = "double",
+        paramType = "query")
+  ))
     def crearNuevaMarcacion() = Action.async { implicit request =>
     val message = "Something go wrong !"
     DatosCrearMarcacion.crearMarcacionForm.bindFromRequest().fold(

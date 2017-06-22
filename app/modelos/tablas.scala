@@ -13,7 +13,7 @@ import play.api.libs.json.Json
 import java.sql.Date
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-
+import io.swagger.annotations.ApiModelProperty
 
 case class Usuario(
  id: Long,
@@ -404,7 +404,7 @@ object DatosCrearMarcacion {
 
 //Login
 case class LoginUser(
-  error: Boolean,
+   @ApiModelProperty(value = "Indicate if theres is a mistake in query or p", dataType = "Boolean")error: Boolean,
   error_msg: Option[String],
   uid: Option[String],
   user: Option[user_data] = None
