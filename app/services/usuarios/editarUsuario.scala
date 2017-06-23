@@ -32,7 +32,7 @@ class EditarUsuario @Inject() (protected val dbConfigProvider: DatabaseConfigPro
       for {      
         _ <- usuarios.filter(_.uid === d.uid)
        .map(p => (p.nombre,p.apellido, p.documento, p.email, p.usuario, p.activo, p.web_login))
-       .update((d.nombre,d.apellido, d.documento, d.email, d.usuario, d.activo, d.web_login))
+       .update((d.nombre,d.apellido, d.documento, Some(d.email), d.usuario, d.activo, d.web_login))
        u <- usuarios.filter(_.uid === d.uid).result
        u1 <- u.length match {
           case n if (n > 0) => DBIO.successful(u.head)

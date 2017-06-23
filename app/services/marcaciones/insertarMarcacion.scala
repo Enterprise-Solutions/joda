@@ -50,11 +50,11 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
           u <- revisaUsuario(d) // usuario de la marcacion, si no existe retorna un Failure.
           l <- revisaLugar(d) // lugar de la marcacion, si no existe retorna un Failure.
           _ <- revisaDistancia(d,l.latitud,l.longitud) // revisa que la distancia sea menor a la permitida para marcar...
-          pruebaActualizar <- updateMarcacion(d, u.id)
+          pruebaActualizar <- updateMarcacion(d, u.id_usuario)
           mOp <- pruebaActualizar match{
               case n if(n > 0) => tipo = "salida"
                                   DBIO.successful("")              
-              case 0 => insertarMarcacion(d,u.id)
+              case 0 => insertarMarcacion(d,u.id_usuario)
               case _ => DBIO.failed(new Exception("Error al actualizar o insertar registro!"))
               
             }
@@ -69,9 +69,13 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
       val hourString = formatOfTime.format(timestamp)
       val timestampstring = datestring + " " + hourString
       val fts = new Timestamp(formatOfTimestamp.parse(timestampstring).getTime())
-          val query = sql"""
-        UPDATE marcaciones SET hora_salida = ${fts}, latitud_salida = ${d.latitud} , longitud_salida = ${d.longitud}
-        WHERE id = ${m.id};
+//      val horaEntrada = for{
+//        m <- marcaciones.filter(_.id_marcacion === m.id_marcacion)
+//      }yield(m.hora_entrada)
+//      val totalHorasTrabajadas = 
+      val query = sql"""
+        UPDATE marcaciones SET hora_salida = ${fts}, latitud_salida = ${d.latitud} , longitud_salida = ${d.longitud} ,total_horas = ${}
+        WHERE id = ${m.id_marcacion};
         """
        for{
           r <- query.as[(Int)]
@@ -84,7 +88,7 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
       val fecha_hoy = new Date(now)
       val q = for{
         m <- marcaciones.sortBy(_.fecha.desc).sortBy(_.hora_entrada.desc)
-        if(m.usuario_id === usuario_id && m.lugar_id === d.lugar_id && m.fecha === fecha_hoy)
+        if(m.id_usuario === usuario_id && m.id_lugar === d.lugar_id && m.fecha === fecha_hoy)
       }yield(m)
       
       for{
@@ -107,11 +111,11 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
       val hourString = formatOfTime.format(timestamp)
       val timestampstring = datestring + " " + hourString
       val fts = new Timestamp(formatOfTimestamp.parse(timestampstring).getTime())
-      val m = Marcacion(usuario_id,d.lugar_id,fecha_hoy,Some(fts),true,0,None,Some(d.latitud),Some(d.longitud),None,None)
+      val m = Marcacion(0,fecha_hoy,fts,d.latitud,d.longitud,None,None,None,true,None,d.lugar_id,usuario_id)
       for{
-         new_id <- marcaciones returning marcaciones.map(_.id) += m
+         new_id <- marcaciones returning marcaciones.map(_.id_marcacion) += m
          m1  <- new_id match{
-         case n if(n > 0) => DBIO.successful(m.copy(id = new_id + 1))
+         case n if(n > 0) => DBIO.successful(m.copy(id_marcacion = new_id + 1))
          case _ => DBIO.failed(new Exception(s"Error al realizar marcación"))
          }
      }yield(m1)
@@ -119,7 +123,7 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
     
     def revisaLugar(d:crearMarcacion): DBIO[Lugar] = {
       for{
-        ls <- lugares.filter(_.id === d.lugar_id).result
+        ls <- lugares.filter(_.id_lugar === d.lugar_id).result
         r <- ls.length match {
           case n if (n > 0) => DBIO.successful("")
           case 0 => DBIO.failed(new Exception(s"No existe un lugar con el id ${d.lugar_id}"))

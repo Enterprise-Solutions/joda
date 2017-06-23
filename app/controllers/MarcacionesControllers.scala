@@ -9,6 +9,7 @@ import scala.util.Success
 import scala.util.Failure
 import services.marcaciones.insertarMarcacion
 import services.marcaciones.marcacionesDeLugares
+import services.marcaciones.listarMarcaciones
 import play.api.libs.json._
 import io.swagger.converter.ModelConverters
 import io.swagger.annotations._
@@ -23,49 +24,49 @@ import scala.concurrent.Future
 
 @Singleton
 @Api(value = "Marcaciones", description = "Operaciones con las marcaciones", consumes="application/x-www-form-urlencoded") 
-class MarcacionesControllers @Inject() (listarMarcacionPorLugares: marcacionesDeLugares, nueva_marcacion: insertarMarcacion,implicit val ec: ExecutionContext) extends Controller {
+class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,listarMarcacionPorLugares: marcacionesDeLugares, nueva_marcacion: insertarMarcacion,implicit val ec: ExecutionContext) extends Controller {
   
   implicit val crearMarcacionJsonFormatter = Json.format[crearMarcacion]
   implicit val datoslugaresmarcacionesJsonFormatter= Json.format[DatosLugaresMarcaciones]
   implicit val lugarJsonFormatter = Json.format[Lugar]
- 
+  implicit val listadoMarcacionsJsonFormatter = Json.format[listadoMarcaciones]
   
   implicit val lugarRWJsonFormatter: Writes[LugarR] = (
     (JsPath \ "id").write[Long] and
-    (JsPath \ "nombre").write[Option[String]] and
+    (JsPath \ "nombre").write[String] and
     (JsPath \ "latitud").write[String] and
     (JsPath \ "longitud").write[String] and
-    (JsPath \ "direccion").write[Option[String]] and
+    (JsPath \ "direccion").write[String] and
     (JsPath \ "empresa_id").write[Long] and
-    (JsPath \ "cliente_id").write[Option[Long]] and
-    (JsPath \ "uid").write[Option[String]] and
+    (JsPath \ "cliente_id").write[Long] and
+    (JsPath \ "uid").write[String] and
     (JsPath \ "es_beacon").write[Boolean] and
     (JsPath \ "tipo_marcacion").write[Long]
   )(unlift(LugarR.unapply))
   
   implicit val lugarRRJsonFormatter: Reads[LugarR] = (
     (__ \ "id").read[Long] and
-    (JsPath \ "nombre").readNullable[String] and
+    (JsPath \ "nombre").read[String] and
     (JsPath \ "latitud").read[String] and
     (JsPath \ "longitud").read[String] and
-    (JsPath \ "direccion").readNullable[String] and
+    (JsPath \ "direccion").read[String] and
     (JsPath \ "empresa_id").read[Long] and
-    (JsPath \ "cliente_id").readNullable[Long] and
-    (JsPath \ "uid").readNullable[String] and
+    (JsPath \ "cliente_id").read[Long] and
+    (JsPath \ "uid").read[String] and
     (JsPath \ "es_beacon").read[Boolean] and
     (JsPath \ "tipo_marcacion").read[Long]
   )(LugarR.apply _)
-  
+
     implicit val MarcacionRJsonFormatter: Writes[MarcacionR] = (
     (JsPath \ "usuario_id").write[Long] and
     (JsPath \ "lugar_id").write[Long] and
     (JsPath \ "fecha").write[String] and
-    (JsPath \ "hora_entrada").write[Option[String]] and
+    (JsPath \ "hora_entrada").write[String] and
     (JsPath \ "es_valido").write[Boolean] and
     (JsPath \ "id").write[Long] and
     (JsPath \ "hora_salida").write[Option[String]] and
-    (JsPath \ "latitud_entrada").write[Option[String]] and
-    (JsPath \ "longitud_entrada").write[Option[String]] and
+    (JsPath \ "latitud_entrada").write[String] and
+    (JsPath \ "longitud_entrada").write[String] and
     (JsPath \ "latitud_salida").write[Option[String]] and
     (JsPath \ "longitud_salida").write[Option[String]]
   )(unlift(MarcacionR.unapply))
@@ -74,12 +75,12 @@ class MarcacionesControllers @Inject() (listarMarcacionPorLugares: marcacionesDe
     (JsPath \ "usuario_id").read[Long] and
     (JsPath \ "lugar_id").read[Long] and
     (JsPath \ "fecha").read[String] and
-    (JsPath \ "hora_entrada").readNullable[String] and
+    (JsPath \ "hora_entrada").read[String] and
     (JsPath \ "es_valido").read[Boolean] and
     (JsPath \ "id").read[Long] and
     (JsPath \ "hora_salida").readNullable[String] and
-    (JsPath \ "latitud_entrada").readNullable[String] and
-    (JsPath \ "longitud_entrada").readNullable[String] and
+    (JsPath \ "latitud_entrada").read[String] and
+    (JsPath \ "longitud_entrada").read[String] and
     (JsPath \ "latitud_salida").readNullable[String] and
     (JsPath \ "longitud_salida").readNullable[String]
   )(MarcacionR.apply _)
@@ -181,5 +182,16 @@ class MarcacionesControllers @Inject() (listarMarcacionPorLugares: marcacionesDe
           }
         )
     }
+    @ApiOperation(value = "listarMarcaciones",
+     notes = "Enlista marcaciones con posibilidades de filtros como el Usuario,Lugar, Fecha, y entre horas de entrada o salida",
+     response = classOf[modelos.listadoMarcaciones],
+     httpMethod = "GET")
+   def listarMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long]) = Action.async{request =>
+     enlistarMarcaciones.mostrarMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long]) map { r =>
+       Ok(Json.toJson(r))
+     } recover {
+      case e: Exception => BadRequest(e.getMessage)
+    }
+   }  
 
 }

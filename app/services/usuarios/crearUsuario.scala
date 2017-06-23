@@ -22,28 +22,28 @@ class CrearUsuario @Inject() (protected val dbConfigProvider: DatabaseConfigProv
     
     def _crearUsuario (d: DatosNuevoUsuario): DBIO[nuevoUsuario] = {
        for{
-          _ <- buscarUsuario(d.documento) // Si el usuario ya existe retorna un Failure.
+          _ <- buscarUsuario(d.usuario) // Si el usuario ya existe retorna un Failure.
           u <- _insertarNuevoUsuario(d)
         }yield(nuevoUsuario(false,None,Some(u)))
     }
         
     def _insertarNuevoUsuario(d: DatosNuevoUsuario): DBIO[Usuario] = {
-    val u = Usuario(0,d.nombre, d.apellido,d.documento,d.email, d.usuario, d.password, "1", d.activo, d.web_login)
+    val u = Usuario(0,d.nombre, d.apellido,d.documento,Some(d.email), d.usuario, d.password, "1", d.activo, d.web_login,d.empresas_id)
     for{
-      new_id <- usuarios returning usuarios.map(_.id) += u
+      new_id <- usuarios returning usuarios.map(_.id_usuario) += u
       u1  <- new_id match{
-        case n if(n > 0) => DBIO.successful(u.copy(id = new_id))
+        case n if(n > 0) => DBIO.successful(u.copy(id_usuario = new_id))
         case _ => DBIO.failed(new Exception(s"No se pudo insertar el usuario"))
       }
     }yield(u1)
   }
         
-  def buscarUsuario(documento: String) = {
+  def buscarUsuario(usuario: String) = {
     for {
-        us <- usuarios.filter(_.documento === documento).result
+        us <- usuarios.filter(_.usuario === usuario).result
         _ <- us.length match {
           case 0 => DBIO.successful("")
-          case n if (n > 0) => DBIO.failed(new Exception(s"Ya existe usuario con documento ${documento}"))
+          case n if (n > 0) => DBIO.failed(new Exception(s"Ya existe usuario con documento ${usuario}"))
           case _ => DBIO.failed(new Exception("Problemas al consultar con la base de datos"))
         }
       }yield()

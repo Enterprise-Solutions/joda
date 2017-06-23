@@ -54,7 +54,7 @@ class marcacionesDeLugares @Inject() (protected val dbConfigProvider: DatabaseCo
   }
   
   def _getLugarR(l: Lugar) = {
-    LugarR(l.id,l.nombre,l.latitud.toString(),l.longitud.toString(),l.direccion,l.empresa_id,l.cliente_id,l.uid,l.es_beacon,2)
+    LugarR(l.id_lugar,l.nombre,l.latitud.toString(),l.longitud.toString(),l.direccion,l.id_empresa,l.id_cliente,l.uid,l.es_beacon,2)
   }
    
   
@@ -71,7 +71,7 @@ class marcacionesDeLugares @Inject() (protected val dbConfigProvider: DatabaseCo
   
   def _getLugarM(l:LugarR,d:DatosLugaresMarcaciones) = {
     for{
-      ms <- marcacionesUser(d,l.id)
+      ms <- marcacionesUser(d,l.id_lugar)
     }yield(
       lugaresM(l,ms)    
     )
@@ -89,8 +89,8 @@ class marcacionesDeLugares @Inject() (protected val dbConfigProvider: DatabaseCo
     val uid = d.uid
     val fecha = new Date(formatOfDate.parse(d.fecha).getTime)
     val q = for{
-      (m,u) <- marcaciones join usuarios on (_.usuario_id === _.id)
-            if(u.uid === uid && m.lugar_id === lugar_id && m.fecha === fecha)
+      (m,u) <- marcaciones join usuarios on (_.id_usuario === _.id_usuario)
+            if(u.uid === uid && m.id_lugar === lugar_id && m.fecha === fecha)
     }yield(m)
     for{
       r <- q.result
@@ -98,20 +98,11 @@ class marcacionesDeLugares @Inject() (protected val dbConfigProvider: DatabaseCo
       r1 <- uOp match{
         case None => DBIO.failed(new Exception(s"No existe usuario con uid: ${d.uid}"))
         case Some(_) => DBIO.successful{r map {m =>
-        Marcaje(MarcacionR(m.usuario_id,m.lugar_id,formatOfDate.format(m.fecha),
-            m.hora_entrada match {
+        Marcaje(MarcacionR(m.id_usuario,m.id_lugar,formatOfDate.format(m.fecha),
+            formatofHour.format(m.hora_entrada),m.es_valido,m.id_marcacion,
+           m.hora_salida match {
               case Some(s) => Some(formatofHour.format(s))
-              case None => None}
-        ,m.es_valido,m.id,
-        m.hora_salida match {
-              case Some(s) => Some(formatofHour.format(s))
-              case None => None}
-          ,m.latitud_entrada match {
-              case Some(s) => Some(s.toString())
-              case None => None}
-          ,m.longitud_entrada match {
-              case Some(s) => Some(s.toString())
-              case None => None}
+              case None => None},m.latitud_entrada.toString(),m.longitud_entrada.toString()
           ,m.latitud_salida match {
               case Some(s) => Some(s.toString())
               case None => None}

@@ -36,7 +36,9 @@ class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUs
   implicit val lugarJsonFormatter = Json.format[listadoUsuarios]
   implicit val datosNuevoUsuarioJsonFormatter = Json.format[DatosNuevoUsuario]
   implicit val nuevoUsuarioJsonFormatter = Json.format[nuevoUsuario]
-
+  implicit val datosEditarUsuarioJsonFormatter = Json.format[DatosEditarUsuario]
+  implicit val editarUsuarioJsonFormatter = Json.format[edicionUsuario]
+      
   
   @ApiOperation(value = "loginUser",
      notes = "Permite Loguear un Usuario",
@@ -56,9 +58,6 @@ class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUs
         dataType = "string",
         paramType = "query")
   ))
-  implicit val datosEditarUsuarioJsonFormatter = Json.format[DatosEditarUsuario]
-  implicit val editarUsuarioJsonFormatter = Json.format[edicionUsuario]
-      
   def loginUser() = Action.async { implicit request =>
    val message = "Something go wrong !"
    DatosLoginUser.loginForm.bindFromRequest().fold(
@@ -141,6 +140,8 @@ class UsuariosController @Inject() (editar: EditarUsuario, nuevoUsuario: CrearUs
         dataType = "boolean",
         paramType = "query")
   ))
+  @ApiResponses(Array(new ApiResponse(code = 400, message = "Invalid ID supplied",response = classOf[modelos.nuevoUsuario]),
+      new ApiResponse(code = 404, message = "Pet not found",  response = classOf[modelos.nuevoUsuarioNoencontrado])))
   def crearUsuario() = Action.async { implicit request =>
    val message = "Something go wrong !"
    DatosNuevoUsuario.datosNuevoUsuarioForm.bindFromRequest().fold(

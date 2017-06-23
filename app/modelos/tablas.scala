@@ -1,6 +1,8 @@
 package modelos
 
 import play.api.Play
+import play.api.data._
+import play.api.data.Forms._
 import play.api.data.format.Formats._ 
 import slick.driver.PostgresDriver.api._
 import java.sql.Timestamp
@@ -15,21 +17,136 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import io.swagger.annotations.ApiModelProperty
 
+/*
+ * TABLAS DB's--------------------------
+ * -------------------------------------------------------------------------------------------
+ */
 case class Usuario(
- id: Long,
+ id_usuario: Long,
  nombre: String,
  apellido: String,
  documento: String,
- email: String,
+ email: Option[String],
  usuario:String,
  password: String,
  uid:String,
  activo:Boolean,
- web_login:Boolean
+ web_login:Boolean,
+ id_empresa:Long
 )
+class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
+  def id_usuario = column[Long]("id_usuario",O.PrimaryKey,O.AutoInc)
+  def nombre   = column[String]("nombre") // it could be null...
+  def apellido = column[String]("apellido")
+  def documento = column[String]("documento")
+  def email = column[Option[String]]("email")
+  def usuario   = column[String]("usuario")
+  def password = column[String]("password")
+  def uid = column[String]("uid")
+  def activo= column[Boolean]("activo")
+  def web_login = column[Boolean]("web_login")
+  def id_empresa = column[Long]("id_empresa")
+  
+  def * = (id_usuario,nombre,apellido,documento,email,usuario,password,uid,activo,web_login,id_empresa) <> (Usuario.tupled,Usuario.unapply)
+}
+
+case class Cliente(
+    id_cliente:Long,
+    nombre:String,
+    ruc:String,
+    id_empresa:Int
+ )
+ class ClienteT (tag: Tag) extends Table[Cliente](tag,"clientes"){
+  def id_cliente = column[Long]("id_cliente",O.PrimaryKey,O.AutoInc)
+  def nombre   = column[String]("nombre")
+  def ruc = column[String]("ruc")
+  def id_empresa   = column[Int]("id_empresa")
+  def * = (id_cliente,nombre,ruc,id_empresa) <> (Cliente.tupled,Cliente.unapply)
+}
+
+ case class Lugar( // tabla en la BD
+ id_lugar: Long,
+ nombre: String,
+ uid:String,
+ latitud: Double,
+ longitud: Double,
+ es_beacon: Boolean,
+ direccion:String,
+ id_cliente: Long,
+ id_empresa: Long
+)
+class LugarT (tag: Tag) extends Table[Lugar](tag,"lugares"){
+  def id_lugar = column[Long]("id_lugar",O.PrimaryKey,O.AutoInc)
+  def nombre = column[String]("nombre")
+  def uid = column[String]("uid")
+  def latitud = column[Double]("latitud")
+  def longitud = column[Double]("longitud")
+  def es_beacon= column[Boolean]("es_beacon")
+  def direccion   = column[String]("direccion")
+  def id_cliente = column[Long]("id_cliente")
+  def id_empresa= column[Long]("id_empresa")
+  
+  def * = (id_lugar,nombre,uid,latitud,longitud,es_beacon,direccion,id_cliente,id_empresa) <> (Lugar.tupled,Lugar.unapply)
+}
+
+case class Marcacion(
+ id_marcacion:Long,
+ fecha: Date,
+ hora_entrada: Timestamp,
+ latitud_entrada: Double,
+ longitud_entrada: Double,
+ hora_salida: Option[Timestamp],
+ latitud_salida: Option[Double],
+ longitud_salida: Option[Double],
+ es_valido: Boolean,
+ total_horas:Option[Timestamp],
+ id_lugar: Long,
+ id_usuario: Long
+)
+class MarcacionT (tag: Tag) extends Table[Marcacion](tag,"marcaciones"){
+  def id_marcacion = column[Long]("id_marcacion",O.PrimaryKey,O.AutoInc)
+  def fecha = column[Date] ("fecha")
+  def hora_entrada   = column[Timestamp]("hora_entrada")
+  def latitud_entrada = column[Double]("latitud_entrada")
+  def longitud_entrada = column[Double]("longitud_entrada")
+  def hora_salida   = column[Option[Timestamp]]("hora_salida")
+  def latitud_salida = column[Option[Double]]("latitud_salida")
+  def longitud_salida = column[Option[Double]]("longitud_salida")
+  def es_valido= column[Boolean]("es_valido")
+  def total_horas   = column[Option[Timestamp]]("total_horas")
+  def id_lugar = column[Long]("id_lugar")
+  def id_usuario= column[Long]("id_usuario")
+  
+  def * = (id_marcacion,fecha,hora_entrada,latitud_entrada,longitud_entrada,hora_salida,latitud_salida,longitud_salida,es_valido,total_horas,id_lugar,id_usuario) <> (Marcacion.tupled,Marcacion.unapply)
+}
+
+case class Empresa(
+  id_empresa:Long,
+  nombre:String,
+  logo:Option[String],
+  color1:Option[String],
+  color2:Option[String],
+  color3:Option[String],
+  cnt_usuarios_plan:Int
+)
+class EmpresaT (tag: Tag) extends Table[Empresa](tag,"empresas"){
+  def id_empresa = column[Long]("id",O.PrimaryKey,O.AutoInc)
+  def nombre   = column[String]("nombre") // it could be null...
+  def logo = column[Option[String]]("logo")
+  def color1 = column[Option[String]]("color1")
+  def color2 = column[Option[String]]("color2")
+  def color3   = column[Option[String]]("color3")
+  def cnt_usuarios_plan = column[Int]("cnt_usuarios_plan")
+  
+  def * = (id_empresa,nombre,logo,color1,color2,color3,cnt_usuarios_plan) <> (Empresa.tupled,Empresa.unapply)
+}
+
+/*
+ * -------------------------------------------------------------------------------------------------------------------
+ */
 
 case class UsuarioJ( //Json que se pasa como respuesta
- id: Long,
+ id_usuario: Long,
  nombre: String,
  apellido: String,
  documento: String,
@@ -50,14 +167,21 @@ case class DatosNuevoUsuario(
  usuario:String,
  password: String,
  activo:Boolean,
- web_login:Boolean
+ web_login:Boolean,
+ empresas_id:Int
 )
+
 
 //Json de respuesta al crear nuevo usuario
 case class nuevoUsuario(
     error: Boolean,
     error_msg: Option[String],
     usuario: Option[Usuario]
+)
+
+case class nuevoUsuarioNoencontrado(
+    error: Boolean,
+    error_msg: Option[String]
 )
 
 //datos a editar de un usuario
@@ -79,104 +203,39 @@ case class edicionUsuario(
     usuario: Option[Usuario]
 )
 
-case class Lugar( // tabla en la BD
- id: Long,
- nombre: Option[String],
- uid:Option[String],
- latitud: Double,
- longitud: Double,
- es_beacon: Boolean,
- direccion:Option[String],
- cliente_id: Option[Long],
- empresa_id: Long
-)
+case class listaLugares(
+    id: Long,
+    nombre: String,
+    direccion:String
+   )
 
 
 case class LugarR( // JSON que se pasa como Respuesta...
- id: Long,
- nombre: Option[String],
+ id_lugar: Long,
+ nombre: String,
  latitud: String,
  longitud: String,
- direccion:Option[String],
+ direccion:String,
  empresa_id: Long,
- cliente_id: Option[Long],
- uid:Option[String],
+ cliente_id: Long,
+ uid:String,
  es_beacon:Boolean,
  tipo_marcacion: Long
-)
-
-case class Marcacion(
- usuario_id: Long,
- lugar_id: Long,
- fecha: Date,
- hora_entrada: Option[Timestamp],
- es_valido: Boolean,
- id: Long,
- hora_salida: Option[Timestamp],
- latitud_entrada: Option[Double],
- longitud_entrada: Option[Double],
- latitud_salida: Option[Double],
- longitud_salida: Option[Double]
 )
 
 case class MarcacionR(
  usuario_id: Long,
  lugar_id: Long,
  fecha: String,
- hora_entrada: Option[String],
+ hora_entrada: String,
  es_valido: Boolean,
  id: Long,
  hora_salida: Option[String],
- latitud_entrada: Option[String],
- longitud_entrada: Option[String],
+ latitud_entrada: String,
+ longitud_entrada: String,
  latitud_salida: Option[String],
  longitud_salida: Option[String]
 )
-
-class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
-  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def nombre   = column[String]("nombre") // it could be null...
-  def apellido = column[String]("apellido")
-  def documento = column[String]("documento")
-  def email = column[String]("email")
-  def usuario   = column[String]("usuario")
-  def password = column[String]("password")
-  def uid = column[String]("uid")
-  def activo= column[Boolean]("activo")
-  def web_login = column[Boolean]("web_login")
-  
-  def * = (id,nombre,apellido,documento,email,usuario,password,uid,activo,web_login) <> (Usuario.tupled,Usuario.unapply)
-}
-
-class LugarT (tag: Tag) extends Table[Lugar](tag,"lugares"){
-  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def nombre = column[Option[String]]("nombre")
-  def uid = column[Option[String]]("uid")
-  def latitud = column[Double]("latitud")
-  def longitud = column[Double]("longitud")
-  def es_beacon= column[Boolean]("es_beacon")
-  def direccion   = column[Option[String]]("direccion")
-  def cliente_id = column[Option[Long]]("cliente_id")
-  def empresa_id= column[Long]("empresa_id")
-  
-  def * = (id,nombre,uid,latitud,longitud,es_beacon,direccion,cliente_id,empresa_id) <> (Lugar.tupled,Lugar.unapply)
-}
-
-class MarcacionT (tag: Tag) extends Table[Marcacion](tag,"marcaciones"){
-  def usuario_id = column[Long]("usuario_id")
-  def lugar_id = column[Long]("lugar_id")
-  def fecha = column[Date] ("fecha")
-  def hora_entrada   = column[Option[Timestamp]]("hora_entrada")
-  def es_valido= column[Boolean]("es_valido")
-  def id = column[Long]("id",O.PrimaryKey,O.AutoInc)
-  def hora_salida   = column[Option[Timestamp]]("hora_salida")
-  def latitud_entrada = column[Option[Double]]("latitud_entrada")
-  def longitud_entrada = column[Option[Double]]("longitud_entrada")
-  def latitud_salida = column[Option[Double]]("latitud_salida")
-  def longitud_salida = column[Option[Double]]("longitud_salida")
-  
-  def * = (usuario_id,lugar_id,fecha,hora_entrada,es_valido,id,hora_salida,latitud_entrada,longitud_entrada,latitud_salida,longitud_salida) <> (Marcacion.tupled,Marcacion.unapply)
-}
 
 // Inputs...
 
@@ -218,7 +277,8 @@ object DatosNuevoUsuario {
     "usuario" -> text,
     "password" -> text,
     "activo" -> boolean,
-    "web_login" -> boolean
+    "web_login" -> boolean,
+    "empresas_id" -> number
     )(DatosNuevoUsuario.apply)(DatosNuevoUsuario.unapply)
   )
   
@@ -230,11 +290,12 @@ object DatosNuevoUsuario {
     ((__ \ "usuario").read[String]) and
     ((__ \ "password").read[String]) and
     ((__ \ "activo").read[Boolean]) and
-    ((__ \ "web_login").read[Boolean]) 
+    ((__ \ "web_login").read[Boolean]) and
+    ((__ \ "empresas_id").read[Int])
   )(DatosNuevoUsuario.apply _)  
 
   implicit val writesItem = Writes[DatosNuevoUsuario] {
-    case DatosNuevoUsuario(nombre, apellido, documento, email, usuario, password, activo, web_login) =>
+    case DatosNuevoUsuario(nombre, apellido, documento, email, usuario, password, activo, web_login,empresas_id) =>
       Json.obj(
         "nombre" -> nombre,
         "apellido" -> apellido,
@@ -243,7 +304,8 @@ object DatosNuevoUsuario {
         "usuario" -> usuario,
         "password" -> password,
         "activo" -> activo,
-        "web_login" -> web_login
+        "web_login" -> web_login,
+        "empresas_id" -> empresas_id
       )
   }
 }
@@ -356,11 +418,22 @@ object DatosCrearMarcacion {
   }
 }
 
+case class listadoMarcaciones(
+    lugar:String,
+    usuario:String,//nombre del usuario que marco...
+    dirección:String,
+    cliente:String,//nombre de la empresa...
+    fecha:String,
+    horaEntrada:String,
+    horaSalida:Option[String],
+    tiempoEmpleado: String
+    )
+
 // Respuestas...
 
 //Login
 case class LoginUser(
-   @ApiModelProperty(value = "Indicate if theres is a mistake in query or p", dataType = "Boolean")error: Boolean,
+  error: Boolean,
   error_msg: Option[String],
   uid: Option[String],
   user: Option[user_data] = None
