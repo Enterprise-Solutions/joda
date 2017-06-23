@@ -7,7 +7,7 @@ import play.api.data.format.Formats._
 import slick.driver.PostgresDriver.api._
 import java.sql.Timestamp
 import play.api.data.Form
-import play.api.data.Forms.{mapping, text, of, boolean}
+import play.api.data.Forms.{mapping, text, of, boolean, optional}
 import play.api.data.format.Formats.doubleFormat
 import play.api.libs.json.{__, Reads, Writes}
 import play.api.libs.functional.syntax._
@@ -203,12 +203,28 @@ case class edicionUsuario(
     usuario: Option[Usuario]
 )
 
+
 case class listaLugares(
     id: Long,
     nombre: String,
     direccion:String
    )
 
+
+//datos para editar contraseña de usuario
+case class DatosEditarContrasenha(
+ uid: String,
+ contrasenha_vieja: Option[String],
+ contrasenha_nueva: String,
+ confirmacion_contrasenha_nueva: String
+)
+
+//Json de respuesta al editar contrasenha del usuario
+case class edicionContrasenha(
+    error: Boolean,
+    error_msg: Option[String],
+    mensaje: Option[String]
+)
 
 case class LugarR( // JSON que se pasa como Respuesta...
  id_lugar: Long,
@@ -346,6 +362,34 @@ object DatosEditarUsuariov {
         "activo" -> activo,
         "web_login" -> web_login,
         "uid" -> uid
+      )
+  }
+}
+
+object DatosEditarContrasenha {
+  val datosEditarContrasenhaForm = Form(
+        mapping(
+    "uid" -> text,
+    "contrasenha_vieja" -> optional(text),
+    "contrasenha_nueva" -> text,
+    "confirmacion_contrasenha_nueva" -> text
+    )(DatosEditarContrasenha.apply)(DatosEditarContrasenha.unapply)
+  )
+  
+ implicit val readsEditPerson: Reads[DatosEditarContrasenha] = (
+    ((__ \ "uid").read[String]) and
+    ((__ \ "contrasenha_vieja").readNullable[String]) and
+    ((__ \ "contrasenha_nueva").read[String]) and
+    ((__ \ "confirmacion_contrasenha_nueva").read[String]) 
+  )(DatosEditarContrasenha.apply _)  
+
+  implicit val writesEditPerson = Writes[DatosEditarContrasenha] {
+    case DatosEditarContrasenha(uid, contrasenha_vieja, contrasenha_nueva, confirmacion_contrasenha_nueva) =>
+      Json.obj(
+        "uid" -> uid,
+        "contrasenha_vieja" -> contrasenha_vieja,
+        "contrasenha_nueva" -> contrasenha_nueva,
+        "confirmacion_contrasenha_nueva" -> confirmacion_contrasenha_nueva
       )
   }
 }

@@ -23,7 +23,7 @@ class EditarUsuario @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     
     def _editarUsuario (d: DatosEditarUsuario): DBIO[edicionUsuario] = {
        for{
-          u <- revisaUsuario(d) // si el usuario no existe retorna un Failure.
+          u <- revisaUsuario(d.uid) // si el usuario no existe retorna un Failure.
           up <- _updateMarcacion(d)
         }yield(edicionUsuario(false,None,Some(up)))
     }
@@ -42,15 +42,15 @@ class EditarUsuario @Inject() (protected val dbConfigProvider: DatabaseConfigPro
        }yield(u1)
     }  
     
-    def revisaUsuario(d: DatosEditarUsuario) = {
+    def revisaUsuario(uid: String) : DBIO[Usuario] = {
       for {
-        us <- usuarios.filter(_.uid === d.uid).result
+        us <- usuarios.filter(_.uid === uid).result
         l <- us.length match {
-          case n if (n > 0) => DBIO.successful("")
-          case 0 => DBIO.failed(new Exception(s"No existe el usuario con uid ${d.uid}"))
+          case n if (n > 0) => DBIO.successful(us.head)
+          case 0 => DBIO.failed(new Exception(s"No existe el usuario con uid ${uid}"))
           case _ => DBIO.failed(new Exception("Problemas al consultar con la base de datos"))
         }
-      }yield()
+      }yield(l)
       
     }
     
