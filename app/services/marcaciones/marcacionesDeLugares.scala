@@ -54,7 +54,7 @@ class marcacionesDeLugares @Inject() (protected val dbConfigProvider: DatabaseCo
   }
   
   def _getLugarR(l: Lugar) = {
-    LugarR(l.id_lugar,l.nombre,l.latitud.toString(),l.longitud.toString(),l.direccion,l.id_empresa,l.id_cliente,l.uid,l.es_beacon,2)
+    LugarR(l.id_lugar,l.nombre,l.latitud.toString(),l.longitud.toString(),l.direccion,l.id_cliente,l.uid,l.es_beacon,2)
   }
    
   

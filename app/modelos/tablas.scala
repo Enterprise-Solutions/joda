@@ -72,8 +72,7 @@ case class Cliente(
  longitud: Double,
  es_beacon: Boolean,
  direccion:String,
- id_cliente: Long,
- id_empresa: Long
+ id_cliente: Long
 )
 class LugarT (tag: Tag) extends Table[Lugar](tag,"lugares"){
   def id_lugar = column[Long]("id_lugar",O.PrimaryKey,O.AutoInc)
@@ -84,9 +83,8 @@ class LugarT (tag: Tag) extends Table[Lugar](tag,"lugares"){
   def es_beacon= column[Boolean]("es_beacon")
   def direccion   = column[String]("direccion")
   def id_cliente = column[Long]("id_cliente")
-  def id_empresa= column[Long]("id_empresa")
   
-  def * = (id_lugar,nombre,uid,latitud,longitud,es_beacon,direccion,id_cliente,id_empresa) <> (Lugar.tupled,Lugar.unapply)
+  def * = (id_lugar,nombre,uid,latitud,longitud,es_beacon,direccion,id_cliente) <> (Lugar.tupled,Lugar.unapply)
 }
 
 case class Marcacion(
@@ -232,7 +230,6 @@ case class LugarR( // JSON que se pasa como Respuesta...
  latitud: String,
  longitud: String,
  direccion:String,
- empresa_id: Long,
  cliente_id: Long,
  uid:String,
  es_beacon:Boolean,
@@ -480,6 +477,7 @@ case class LoginUser(
   error: Boolean,
   error_msg: Option[String],
   uid: Option[String],
+  token:Option[String],
   user: Option[user_data] = None
 )
 

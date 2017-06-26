@@ -7,7 +7,7 @@ import slick.driver.PostgresDriver
 import modelos.UsuarioT
 import modelos.LugarT
 import modelos.MarcacionT
-import modelos.EmpresaT
+import modelos.ClienteT
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import modelos.Marcacion
@@ -25,17 +25,17 @@ class listarMarcaciones @Inject() (protected val dbConfigProvider: DatabaseConfi
   val usuarios = TableQuery[UsuarioT]
   val lugares = TableQuery[LugarT]
   val marcaciones = TableQuery[MarcacionT]
-  var empresas = TableQuery[EmpresaT]
+  var clientes = TableQuery[ClienteT]
   val formatOfDate = new SimpleDateFormat("yyyy-MM-dd")
   val formatOfTime = new SimpleDateFormat("HH:mm:ss")
   val formatOfTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
   
- def mostrarMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long]):Future[Seq[listadoMarcaciones]] = {
-    db.run(_showMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long]))
+ def mostrarMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]):Future[Seq[listadoMarcaciones]] = {
+    db.run(_showMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]))
   }
   
-   def _showMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long]) = {
+   def _showMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) = {
      val now = (Calendar.getInstance().getTime()).getTime()
      val fecha_hoy = new Date(now)
      val timestamp = new Timestamp(now)
@@ -53,13 +53,10 @@ class listarMarcaciones @Inject() (protected val dbConfigProvider: DatabaseConfi
      val fechaDate = fecha.map{ f =>
              new Date(formatOfDate.parse(f).getTime)
            }.getOrElse(fecha_hoy)
-     val horaComp = hora.map{ h_e =>
-            new Timestamp(formatOfTime.parse(h_e).getTime)
-          }.getOrElse(fts)
      var q = for{
-       (((ls,ms),us),es) <- places join marcaciones on (_.id_lugar === _.id_lugar) join users on (_._2.id_usuario === _.id_usuario) join empresas on (_._1._1.id_empresa === _.id_empresa)
+       (((ls,ms),us),cs) <- places join marcaciones on (_.id_lugar === _.id_lugar) join users on (_._2.id_usuario === _.id_usuario) join clientes on (_._1._1.id_cliente === _.id_cliente)
                            if(ms.fecha === fechaDate)
-     }yield((ls,ms,us,es))
+     }yield((ls,ms,us,cs))
      for{
        jr <- q.result
        r <- DBIO.successful(jr.map{x => new listadoMarcaciones(x._1.nombre,x._3.nombre,x._1.direccion,x._4.nombre,formatOfDate.format(fechaDate),formatOfTimestamp.format(x._2.hora_entrada),Some(formatOfTimestamp.format(x._2.hora_salida)),"0")})

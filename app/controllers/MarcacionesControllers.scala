@@ -17,6 +17,7 @@ import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -30,14 +31,12 @@ class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,li
   implicit val datoslugaresmarcacionesJsonFormatter= Json.format[DatosLugaresMarcaciones]
   implicit val lugarJsonFormatter = Json.format[Lugar]
   implicit val listadoMarcacionsJsonFormatter = Json.format[listadoMarcaciones]
-  
   implicit val lugarRWJsonFormatter: Writes[LugarR] = (
     (JsPath \ "id").write[Long] and
     (JsPath \ "nombre").write[String] and
     (JsPath \ "latitud").write[String] and
     (JsPath \ "longitud").write[String] and
     (JsPath \ "direccion").write[String] and
-    (JsPath \ "empresa_id").write[Long] and
     (JsPath \ "cliente_id").write[Long] and
     (JsPath \ "uid").write[String] and
     (JsPath \ "es_beacon").write[Boolean] and
@@ -50,7 +49,6 @@ class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,li
     (JsPath \ "latitud").read[String] and
     (JsPath \ "longitud").read[String] and
     (JsPath \ "direccion").read[String] and
-    (JsPath \ "empresa_id").read[Long] and
     (JsPath \ "cliente_id").read[Long] and
     (JsPath \ "uid").read[String] and
     (JsPath \ "es_beacon").read[Boolean] and
@@ -122,11 +120,11 @@ class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,li
          Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
         },
           d => { 
-            listarMarcacionPorLugares.showMarcaciones(d) map{ u =>
-              Ok(Json.toJson(u))
-            }recover {
-              case e: Exception => BadRequest(e.getMessage)
-            }
+              listarMarcacionPorLugares.showMarcaciones(d) map{ u =>
+                Ok(Json.toJson(u))
+              }recover {
+                case e: Exception => BadRequest(e.getMessage)
+              }
          }
     )
   }
@@ -186,8 +184,8 @@ class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,li
      notes = "Enlista marcaciones con posibilidades de filtros como el Usuario,Lugar, Fecha, y entre horas de entrada o salida",
      response = classOf[modelos.listadoMarcaciones],
      httpMethod = "GET")
-   def listarMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long]) = Action.async{request =>
-     enlistarMarcaciones.mostrarMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long]) map { r =>
+   def listarMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) = Action.async{request =>
+     enlistarMarcaciones.mostrarMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) map { r =>
        Ok(Json.toJson(r))
      } recover {
       case e: Exception => BadRequest(e.getMessage)

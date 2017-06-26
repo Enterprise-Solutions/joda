@@ -14,6 +14,8 @@ import io.swagger.annotations._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import io.really.jwt._
+import pdi.jwt.{Jwt, JwtAlgorithm, JwtHeader, JwtClaim, JwtOptions}
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -26,7 +28,7 @@ class LugaresControllers @Inject() (listarlugares:listarLugar,implicit val ec: E
   
   implicit val lugarJsonFormatter = Json.format[Lugar]
   implicit val listarLugaresFormatter = Json.format[listaLugares]
-  
+  val HEADER_STRING = "Authorization"
 
   implicit val lugarRWJsonFormatter: Writes[LugarR] = (
     (JsPath \ "id").write[Long] and
@@ -34,7 +36,6 @@ class LugaresControllers @Inject() (listarlugares:listarLugar,implicit val ec: E
     (JsPath \ "latitud").write[String] and
     (JsPath \ "longitud").write[String] and
     (JsPath \ "direccion").write[String] and
-    (JsPath \ "empresa_id").write[Long] and
     (JsPath \ "cliente_id").write[Long] and
     (JsPath \ "uid").write[String] and
     (JsPath \ "es_beacon").write[Boolean] and
@@ -47,7 +48,6 @@ class LugaresControllers @Inject() (listarlugares:listarLugar,implicit val ec: E
     (JsPath \ "latitud").read[String] and
     (JsPath \ "longitud").read[String] and
     (JsPath \ "direccion").read[String] and
-    (JsPath \ "empresa_id").read[Long] and
     (JsPath \ "cliente_id").read[Long] and
     (JsPath \ "uid").read[String] and
     (JsPath \ "es_beacon").read[Boolean] and
@@ -60,11 +60,17 @@ class LugaresControllers @Inject() (listarlugares:listarLugar,implicit val ec: E
      response = classOf[modelos.Lugar],
      httpMethod = "GET")
   def listarLugares() = Action.async{request =>
-     listarlugares.mostrarLugares() map { r =>
-       Ok(Json.toJson(r))
-     } recover {
-      case e: Exception => BadRequest(e.getMessage)
-    }
+     val token = request.headers.get(HEADER_STRING).getOrElse("")
+     Jwt.isValid(token, "secretKey", Seq(JwtAlgorithm.HS256)) match {
+       case true =>      
+         listarlugares.mostrarLugares() map { r =>
+           Ok(Json.toJson(r))
+         } recover {
+          case e: Exception => BadRequest(e.getMessage)
+        }
+       case _ => Future(BadRequest("WRONG TOKEN!"))
+     }
+
    }  
 
 }

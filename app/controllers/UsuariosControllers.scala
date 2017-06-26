@@ -29,6 +29,7 @@ import scala.concurrent.Future
 @Api(value = "Usuarios", description = "Operations about Users", consumes="application/x-www-form-urlencoded")
 class UsuariosController @Inject() (editContrasenha: EditarContrasenha, editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
   
+  
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]
   implicit val datosloginJsonFormatter = Json.format[DatosLoginUser]
@@ -65,7 +66,7 @@ class UsuariosController @Inject() (editContrasenha: EditarContrasenha, editar: 
       formWithErrors => {
         Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
        },
-         d => { 
+         d => {
            login.loginU(d) map{ u =>
              Ok(Json.toJson(u))
            }recover {

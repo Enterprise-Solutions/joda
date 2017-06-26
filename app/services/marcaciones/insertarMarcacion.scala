@@ -25,6 +25,7 @@ import modelos.lugaresM
 import modelos.crearMarcacion
 import modelos.marcacionRealizada
 import modelos.ExceptionJoda
+import java.util.concurrent.TimeUnit
 
 class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
@@ -61,36 +62,13 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
         }yield(marcacionRealizada(false,Some(s"Creaste ${tipo} a las $hourString"),None))
     }
     
-    def _updateMarcacion(d: crearMarcacion,m: Marcacion) = {
-      val now = (Calendar.getInstance().getTime()).getTime()
-      val fecha_hoy = new Date(now)
-      val timestamp = new Timestamp(now)
-      val datestring = formatOfDate.format(fecha_hoy)
-      val hourString = formatOfTime.format(timestamp)
-      val timestampstring = datestring + " " + hourString
-      val fts = new Timestamp(formatOfTimestamp.parse(timestampstring).getTime())
-//      val horaEntrada = for{
-//        m <- marcaciones.filter(_.id_marcacion === m.id_marcacion)
-//      }yield(m.hora_entrada)
-//      val totalHorasTrabajadas = 
-      val query = sql"""
-        UPDATE marcaciones SET hora_salida = ${fts}, latitud_salida = ${d.latitud} , longitud_salida = ${d.longitud} ,total_horas = ${}
-        WHERE id = ${m.id_marcacion};
-        """
-       for{
-          r <- query.as[(Int)]
-          r1 <- DBIO.successful{r.toSeq.head}
-       }yield(r1)
-    }
-      
-    def updateMarcacion(d: crearMarcacion, usuario_id:Long) = {
+     def updateMarcacion(d: crearMarcacion, usuario_id:Long) = {
       val now = (Calendar.getInstance().getTime()).getTime()
       val fecha_hoy = new Date(now)
       val q = for{
         m <- marcaciones.sortBy(_.fecha.desc).sortBy(_.hora_entrada.desc)
         if(m.id_usuario === usuario_id && m.id_lugar === d.lugar_id && m.fecha === fecha_hoy)
       }yield(m)
-      
       for{
         r <- q.result.headOption
         p <- r match{
@@ -100,8 +78,36 @@ class insertarMarcacion @Inject() (protected val dbConfigProvider: DatabaseConfi
             case _ => DBIO.successful(0) // estan los registros completos o no existe ninguno todavia...
           }
       }yield(p)
-      
     }
+    
+    def _updateMarcacion(d: crearMarcacion,m: Marcacion) = {
+      val now = (Calendar.getInstance().getTime()).getTime()
+      val fecha_hoy = new Date(now)
+      val timestamp = new Timestamp(now)
+      val datestring = formatOfDate.format(fecha_hoy)
+      val hourString = formatOfTime.format(timestamp)
+      val timestampstring = datestring + " " + hourString 
+      val fts = new Timestamp(formatOfTimestamp.parse(timestampstring).getTime())
+        for{
+         hE<- DBIO.successful{sql"""
+          SELECT hora_entrada FROM marcaciones WHERE id_marcacion = ${m.id_marcacion};
+          """}
+         r <- hE.as[(Timestamp)]
+         r1 <- DBIO.successful{r.toSeq.head}
+         rP <- DBIO.successful(fts.getTime()-r1.getTime())
+         Ts <- DBIO.successful{s"${TimeUnit.MILLISECONDS.toHours(rP)}:${TimeUnit.MILLISECONDS.toMinutes(rP) -  
+          TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(rP))}:${TimeUnit.MILLISECONDS.toSeconds(rP) - 
+          TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(rP))}"}
+         time <- DBIO.successful{new Timestamp(formatOfTimestamp.parse(datestring + " " + Ts).getTime())}
+         query <- DBIO.successful{sql"""
+          UPDATE marcaciones SET hora_salida = ${fts}, latitud_salida = ${d.latitud} , longitud_salida = ${d.longitud}, total_horas = ${time}
+          WHERE id_marcacion = ${m.id_marcacion};
+          """}
+          r2 <- query.as[(Int)]
+          r3 <- DBIO.successful{r2.toSeq.head}
+       }yield(r3)
+    }
+      
     
     def insertarMarcacion(d:crearMarcacion, usuario_id:Long): DBIO[Marcacion] = {
       val now = (Calendar.getInstance().getTime()).getTime()

@@ -111,7 +111,6 @@ class Formatters {
     (JsPath \ "latitud").write[String] and
     (JsPath \ "longitud").write[String] and
     (JsPath \ "direccion").write[String] and
-    (JsPath \ "empresa_id").write[Long] and
     (JsPath \ "cliente_id").write[Long] and
     (JsPath \ "uid").write[String] and
     (JsPath \ "es_beacon").write[Boolean] and
@@ -124,7 +123,6 @@ class Formatters {
     (JsPath \ "latitud").read[String] and
     (JsPath \ "longitud").read[String] and
     (JsPath \ "direccion").read[String] and
-    (JsPath \ "empresa_id").read[Long] and
     (JsPath \ "cliente_id").read[Long] and
     (JsPath \ "uid").read[String] and
     (JsPath \ "es_beacon").read[Boolean] and

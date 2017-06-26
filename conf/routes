@@ -19,7 +19,7 @@ POST	/marcacioneslugares					controllers.MarcacionesControllers.marcacionesLugar
 
 GET		/lugares					controllers.LugaresControllers.listarLugares()
 
-GET		/listadomarcaciones				controllers.MarcacionesControllers.listarMarcaciones(usuario: Option[String], fecha: Option[String], hora:Option[String],lugar_id: Option[Long])
+GET		/listadomarcaciones				controllers.MarcacionesControllers.listarMarcaciones(usuario:Option[String], fecha:Option[String],lugar_id:Option[Long],cliente_id:Option[Long])
 
 POST	/marcar						controllers.MarcacionesControllers.crearNuevaMarcacion()
 
