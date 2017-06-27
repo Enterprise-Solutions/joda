@@ -215,7 +215,7 @@ class UsuariosController @Inject() (editContrasenha: EditarContrasenha, editar: 
   ))
   def editarUsuario() = Action.async { implicit request =>
    val message = "Something go wrong !"
-   DatosEditarUsuariov.datosEditarUsuarioForm.bindFromRequest().fold(
+   DatosEditarUsuario.datosEditarUsuarioForm.bindFromRequest().fold(
       formWithErrors => {
         Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
        },

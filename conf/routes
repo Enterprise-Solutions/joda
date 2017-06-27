@@ -15,15 +15,17 @@ POST	/usuarios/crear				controllers.UsuariosController.crearUsuario()
 POST	/usuarios/editar			controllers.UsuariosController.editarUsuario()
 POST	/usuarios/editarContrasena	controllers.UsuariosController.editarContrasenha()
 
-POST	/marcacioneslugares					controllers.MarcacionesControllers.marcacionesLugares()
+POST	/marcacioneslugares			controllers.MarcacionesControllers.marcacionesLugares()
 
-GET		/lugares					controllers.LugaresControllers.listarLugares()
+GET		/lugares					controllers.LugaresControllers.listarLugares(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String])
+POST	/lugares/crear				controllers.LugaresControllers.crearLugar()
+POST	/lugares/editar				controllers.LugaresControllers.editarLugar()
 
-GET		/listadomarcaciones				controllers.MarcacionesControllers.listarMarcaciones(usuario:Option[String], fecha:Option[String],lugar_id:Option[Long],cliente_id:Option[Long])
+GET		/listadomarcaciones			controllers.MarcacionesControllers.listarMarcaciones(usuario:Option[String], fecha:Option[String],lugar_id:Option[Long],cliente_id:Option[Long])
 
 POST	/marcar						controllers.MarcacionesControllers.crearNuevaMarcacion()
 
-GET   /docs/                   controllers.Application.redirectDocs
+GET   /docs/                   		controllers.Application.redirectDocs
 
 # Swagger API
 GET   /swagger.json                 controllers.ApiHelpController.getResources

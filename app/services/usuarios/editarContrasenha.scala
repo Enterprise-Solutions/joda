@@ -43,7 +43,7 @@ class EditarContrasenha @Inject() (editar: EditarUsuario, protected val dbConfig
     def revisaContrasenha(u: Usuario, d: DatosEditarContrasenha) = {
            
       for {
-        c1 <- d.contrasenha_vieja.map{ cv =>
+        c1 <- d.contrasenha_actual.map{ cv =>
           (cv == u.password) match{
             case true => DBIO.successful("")
             case false => DBIO.failed(new Exception("Las contrasena actual no es válida"))
@@ -64,7 +64,7 @@ class EditarContrasenha @Inject() (editar: EditarUsuario, protected val dbConfig
         throw new Exception("La confirmación no coincide con la contraseña elegida")
       }
       
-      d.contrasenha_vieja.map{ cv =>
+      d.contrasenha_actual.map{ cv =>
         if(cv != u.password)
           throw new Exception("Las contraseñas no son iguales")
       }*/

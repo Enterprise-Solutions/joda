@@ -166,7 +166,7 @@ case class DatosNuevoUsuario(
  password: String,
  activo:Boolean,
  web_login:Boolean,
- empresas_id:Int
+ empresa_id:Int
 )
 
 
@@ -177,6 +177,7 @@ case class nuevoUsuario(
     usuario: Option[Usuario]
 )
 
+//Ejemplo de otra clase que se podría usar como respuesta
 case class nuevoUsuarioNoencontrado(
     error: Boolean,
     error_msg: Option[String]
@@ -201,18 +202,10 @@ case class edicionUsuario(
     usuario: Option[Usuario]
 )
 
-
-case class listaLugares(
-    id: Long,
-    nombre: String,
-    direccion:String
-   )
-
-
 //datos para editar contraseña de usuario
 case class DatosEditarContrasenha(
  uid: String,
- contrasenha_vieja: Option[String],
+ contrasenha_actual: Option[String],
  contrasenha_nueva: String,
  confirmacion_contrasenha_nueva: String
 )
@@ -234,6 +227,47 @@ case class LugarR( // JSON que se pasa como Respuesta...
  uid:String,
  es_beacon:Boolean,
  tipo_marcacion: Long
+)
+
+case class listaLugares(
+    id: Long,
+    nombre: String,
+    direccion:String
+   )
+
+//datos de un nuevo lugar a ser creado
+case class DatosNuevoLugar(
+ nombre: String,
+ direccion: String,
+ latitud: String,
+ longitud: String,
+ es_beacon: Boolean,
+ cliente_id: Int
+)
+
+
+//Json de respuesta al crear nuevo lugar
+case class nuevoLugar(
+    error: Boolean,
+    error_msg: Option[String],
+    usuario: Option[Lugar]
+)
+  
+//datos a editar de un lugar
+case class DatosEditarLugar(
+ nombre: String,
+ direccion: String,
+ latitud: String,
+ longitud: String,
+ es_beacon: Boolean,
+ uid: String
+)
+
+//Json de respuesta al editar datos del lugar
+case class edicionLugar(
+    error: Boolean,
+    error_msg: Option[String],
+    lugar: Option[Lugar]
 )
 
 case class MarcacionR(
@@ -291,7 +325,7 @@ object DatosNuevoUsuario {
     "password" -> text,
     "activo" -> boolean,
     "web_login" -> boolean,
-    "empresas_id" -> number
+    "empresa_id" -> number
     )(DatosNuevoUsuario.apply)(DatosNuevoUsuario.unapply)
   )
   
@@ -304,11 +338,11 @@ object DatosNuevoUsuario {
     ((__ \ "password").read[String]) and
     ((__ \ "activo").read[Boolean]) and
     ((__ \ "web_login").read[Boolean]) and
-    ((__ \ "empresas_id").read[Int])
+    ((__ \ "empresa_id").read[Int])
   )(DatosNuevoUsuario.apply _)  
 
   implicit val writesItem = Writes[DatosNuevoUsuario] {
-    case DatosNuevoUsuario(nombre, apellido, documento, email, usuario, password, activo, web_login,empresas_id) =>
+    case DatosNuevoUsuario(nombre, apellido, documento, email, usuario, password, activo, web_login,empresa_id) =>
       Json.obj(
         "nombre" -> nombre,
         "apellido" -> apellido,
@@ -318,12 +352,12 @@ object DatosNuevoUsuario {
         "password" -> password,
         "activo" -> activo,
         "web_login" -> web_login,
-        "empresas_id" -> empresas_id
+        "empresa_id" -> empresa_id
       )
   }
 }
 
-object DatosEditarUsuariov {
+object DatosEditarUsuario {
   val datosEditarUsuarioForm = Form(
         mapping(
     "nombre" -> text,
@@ -367,7 +401,7 @@ object DatosEditarContrasenha {
   val datosEditarContrasenhaForm = Form(
         mapping(
     "uid" -> text,
-    "contrasenha_vieja" -> optional(text),
+    "contrasenha_actual" -> optional(text),
     "contrasenha_nueva" -> text,
     "confirmacion_contrasenha_nueva" -> text
     )(DatosEditarContrasenha.apply)(DatosEditarContrasenha.unapply)
@@ -375,18 +409,86 @@ object DatosEditarContrasenha {
   
  implicit val readsEditPerson: Reads[DatosEditarContrasenha] = (
     ((__ \ "uid").read[String]) and
-    ((__ \ "contrasenha_vieja").readNullable[String]) and
+    ((__ \ "contrasenha_actual").readNullable[String]) and
     ((__ \ "contrasenha_nueva").read[String]) and
     ((__ \ "confirmacion_contrasenha_nueva").read[String]) 
   )(DatosEditarContrasenha.apply _)  
 
   implicit val writesEditPerson = Writes[DatosEditarContrasenha] {
-    case DatosEditarContrasenha(uid, contrasenha_vieja, contrasenha_nueva, confirmacion_contrasenha_nueva) =>
+    case DatosEditarContrasenha(uid, contrasenha_actual, contrasenha_nueva, confirmacion_contrasenha_nueva) =>
       Json.obj(
         "uid" -> uid,
-        "contrasenha_vieja" -> contrasenha_vieja,
+        "contrasenha_actual" -> contrasenha_actual,
         "contrasenha_nueva" -> contrasenha_nueva,
         "confirmacion_contrasenha_nueva" -> confirmacion_contrasenha_nueva
+      )
+  }
+}
+
+object DatosNuevoLugar {
+  val datosNuevoLugarForm = Form(
+        mapping(
+    "nombre" -> text,
+    "direccion" -> text,
+    "latitud" -> text,
+    "longitud" -> text,
+    "es_beacon" -> boolean,
+    "cliente_id" -> number
+    )(DatosNuevoLugar.apply)(DatosNuevoLugar.unapply)
+  )
+  
+ implicit val readsLugar: Reads[DatosNuevoLugar] = (
+    ((__ \ "nombre").read[String]) and
+    ((__ \ "direccion").read[String]) and
+    ((__ \ "latitud").read[String]) and
+    ((__ \ "longitud").read[String]) and
+    ((__ \ "es_beacon").read[Boolean]) and
+    ((__ \ "cliente_id").read[Int])
+  )(DatosNuevoLugar.apply _)  
+
+  implicit val writesItem = Writes[DatosNuevoLugar] {
+    case DatosNuevoLugar(nombre, direccion, latitud, longitud, es_beacon, cliente_id) =>
+      Json.obj(
+        "nombre" -> nombre,
+        "direccion" -> direccion,
+        "latitud" -> latitud,
+        "longitud" -> longitud,
+        "es_beacon" -> es_beacon,
+        "cliente_id" -> cliente_id
+      )
+  }
+}
+
+object DatosEditarLugar {
+  val datosEditarLugarForm = Form(
+        mapping(
+    "nombre" -> text,
+    "direccion" -> text,
+    "latitud" -> text,
+    "longitud" -> text,
+    "es_beacon" -> boolean,
+    "uid" -> text
+    )(DatosEditarLugar.apply)(DatosEditarLugar.unapply)
+  )
+  
+ implicit val readsEditPerson: Reads[DatosEditarLugar] = (
+    ((__ \ "nombre").read[String]) and
+    ((__ \ "direccion").read[String]) and
+    ((__ \ "latitud").read[String]) and
+    ((__ \ "longitud").read[String]) and
+    ((__ \ "es_beacon").read[Boolean]) and
+    ((__ \ "uid").read[String])
+  )(DatosEditarLugar.apply _)  
+
+  implicit val writesEditPerson = Writes[DatosEditarLugar] {
+    case DatosEditarLugar(nombre, direccion, latitud, longitud, es_beacon, uid) =>
+      Json.obj(
+        "nombre" -> nombre,
+        "direccion" -> direccion,
+        "latitud" -> latitud,
+        "longitud" -> longitud,
+        "es_beacon" -> es_beacon,
+        "uid" -> uid
       )
   }
 }
@@ -506,6 +608,13 @@ case class listadoUsuarios(
     error: Boolean,
     error_msg: Option[String],
     usuarios: Option[Seq[Usuario]],
+    total: Option[Int]
+)
+
+case class listadoLugares(
+    error: Boolean,
+    error_msg: Option[String],
+    lugares: Option[Seq[listaLugares]],
     total: Option[Int]
 )
 
