@@ -16,9 +16,7 @@ import io.swagger.annotations._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import io.really.jwt._
-import pdi.jwt.{Jwt, JwtAlgorithm, JwtHeader, JwtClaim, JwtOptions}
-
+import services.jwt.authenticacionByJwt
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -66,7 +64,7 @@ class LugaresControllers @Inject() (editar: EditarLugar, crear: CrearLugar,lista
      httpMethod = "GET")
   def listarLugares(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String]) = Action.async{request =>
      val token = request.headers.get(HEADER_STRING).getOrElse("")
-     Jwt.isValid(token, "secretKey", Seq(JwtAlgorithm.HS256)) match {
+     authenticacionByJwt.esValido(token, "secretKey") match {
        case true =>      
          listarlugares.mostrarLugares(busqueda, pagina, cantidad, ordenarPor, direccionOrd) map { r =>
            Ok(Json.toJson(r))
