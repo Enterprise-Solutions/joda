@@ -143,7 +143,7 @@ class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,li
       new ApiImplicitParam(
         name = "hora",
         value = "Date",
-        required = true,
+        required = false,
         dataType = "string",
         paramType = "query"),
       new ApiImplicitParam(
