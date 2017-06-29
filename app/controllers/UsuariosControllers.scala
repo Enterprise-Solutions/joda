@@ -8,6 +8,7 @@ import Framework.Formatters
 import scala.util.Success
 import scala.util.Failure
 import services.usuarios.Login
+import services.usuarios.Logout
 import services.usuarios.Listar
 import services.usuarios.CrearUsuario
 import io.swagger.converter.ModelConverters
@@ -19,7 +20,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-
+import services.jwt.TokenDB
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -27,11 +28,13 @@ import scala.concurrent.Future
 
 @Singleton
 @Api(value = "Usuarios", description = "Operations about Users", consumes="application/x-www-form-urlencoded")
-class UsuariosController @Inject() (editContrasenha: EditarContrasenha, editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
+class UsuariosController @Inject() (tokenU: TokenDB, logoutU: Logout, editContrasenha: EditarContrasenha, editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
   
-  
+  val HEADER_STRING = "Authorization"
+  val error_token = "Token incorrecto o caducado. Volver a autenticarse"
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]
+  implicit val usuariologoutJsonFormatter = Json.format[LogoutUser]
   implicit val datosloginJsonFormatter = Json.format[DatosLoginUser]
   implicit val usuariosJsonFormatter = Json.format[Usuario]  
   implicit val lugarJsonFormatter = Json.format[listadoUsuarios]
@@ -73,8 +76,44 @@ class UsuariosController @Inject() (editContrasenha: EditarContrasenha, editar: 
              case e: Exception => BadRequest(e.getMessage)
            }
          }
-     )
+    )
  }  
+  
+   @ApiOperation(value = "logoutUser",
+     notes = "Permite cerrar sesión de un Usuario",
+     response = classOf[modelos.LogoutUser],
+     httpMethod = "POST")
+  @ApiImplicitParams(Array(
+      new ApiImplicitParam(
+        name = "usuario",
+        value = "User's name",
+        required = true,
+        dataType = "string",
+        paramType = "query")
+  ))
+  def logoutUser() = Action.async { implicit request =>
+   val message = "Something go wrong !"
+   val token = request.headers.get(HEADER_STRING).getOrElse("")
+   for{
+     v <- tokenU.esValido(token, "secretKey")
+     f <- v match{
+       case true =>  DatosLogoutUser.logoutForm.bindFromRequest().fold(
+          formWithErrors => {
+            Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
+           },
+           d => {
+             logoutU.logoutU(d) map{ u =>
+               Ok(Json.toJson(u))
+             }recover {
+              case e: Exception => BadRequest(e.getMessage)
+             }
+           }
+         )
+       case _ => Future(BadRequest(error_token))
+     }
+   }yield(f)
+ }
+       
   
   @ApiOperation(value = "listar",
      notes = "Genera una lista de los usuarios segun una busqueda ",

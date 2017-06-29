@@ -16,7 +16,7 @@ import io.swagger.annotations._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import services.jwt.authenticacionByJwt
+import services.jwt.TokenDB
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -24,7 +24,7 @@ import services.jwt.authenticacionByJwt
 
 @Singleton
 @Api(value = "Lugares", description = "Operaciones con lugares", consumes="application/x-www-form-urlencoded ,application/json") 
-class LugaresControllers @Inject() (editar: EditarLugar, crear: CrearLugar,listarlugares:listarLugar,implicit val ec: ExecutionContext) extends Controller {
+class LugaresControllers @Inject() (tokenU: TokenDB, editar: EditarLugar, crear: CrearLugar,listarlugares:listarLugar,implicit val ec: ExecutionContext) extends Controller {
   
   implicit val lugarJsonFormatter = Json.format[Lugar]
   implicit val listarLugaresFormatter = Json.format[listaLugares]
@@ -64,16 +64,19 @@ class LugaresControllers @Inject() (editar: EditarLugar, crear: CrearLugar,lista
      httpMethod = "GET")
   def listarLugares(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String]) = Action.async{request =>
      val token = request.headers.get(HEADER_STRING).getOrElse("")
-     authenticacionByJwt.esValido(token, "secretKey") match {
-       case true =>      
-         listarlugares.mostrarLugares(busqueda, pagina, cantidad, ordenarPor, direccionOrd) map { r =>
-           Ok(Json.toJson(r))
-         } recover {
-          case e: Exception => BadRequest(e.getMessage)
-        }
-       case _ => Future(BadRequest("WRONG TOKEN!"))
-     }
-
+     
+     for {
+       f <- tokenU.esValido(token, "secretKey") 
+       r <- f match {
+         case true =>      
+           listarlugares.mostrarLugares(busqueda, pagina, cantidad, ordenarPor, direccionOrd) map { r =>
+             Ok(Json.toJson(r))
+           } recover {
+            case e: Exception => BadRequest(e.getMessage)
+          }
+         case _ => Future(BadRequest("WRONG TOKEN!"))
+       }
+     }yield(r)
    }  
 
   @ApiOperation(value = "crearLugar",

@@ -32,7 +32,8 @@ case class Usuario(
  uid:String,
  activo:Boolean,
  web_login:Boolean,
- id_empresa:Long
+ id_empresa:Long,
+ token: Option[String]
 )
 class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
   def id_usuario = column[Long]("id_usuario",O.PrimaryKey,O.AutoInc)
@@ -46,8 +47,9 @@ class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
   def activo= column[Boolean]("activo")
   def web_login = column[Boolean]("web_login")
   def id_empresa = column[Long]("id_empresa")
+  def token = column[Option[String]]("token")
   
-  def * = (id_usuario,nombre,apellido,documento,email,usuario,password,uid,activo,web_login,id_empresa) <> (Usuario.tupled,Usuario.unapply)
+  def * = (id_usuario,nombre,apellido,documento,email,usuario,password,uid,activo,web_login,id_empresa,token) <> (Usuario.tupled,Usuario.unapply)
 }
 
 case class Cliente(
@@ -292,6 +294,11 @@ case class DatosLoginUser(
     password:String
 )
 
+//Login
+case class DatosLogoutUser(
+    usuario:String
+)
+
 object DatosLoginUser {
   val loginForm = Form(
         mapping(
@@ -310,6 +317,21 @@ object DatosLoginUser {
       Json.obj(
         "usuario" -> usuario,
         "password" -> password
+      )
+  } 
+}
+
+object DatosLogoutUser {
+  val logoutForm = Form(
+        mapping(
+    "usuario" -> text
+    )(DatosLogoutUser.apply)(DatosLogoutUser.unapply)
+  )
+
+  implicit val writesItem = Writes[DatosLogoutUser] {
+    case DatosLogoutUser(usuario) =>
+      Json.obj(
+        "usuario" -> usuario
       )
   } 
 }
@@ -580,7 +602,15 @@ case class LoginUser(
   error_msg: Option[String],
   uid: Option[String],
   token:Option[String],
-  user: Option[user_data] = None
+  user: Option[user_data] = None,
+  prueba: Option[Int]
+)
+
+//respuesta JSON de logout de usuario
+case class LogoutUser(
+  error: Boolean,
+  error_msg: Option[String],
+  msg: Option[String]
 )
 
 case class user_data(

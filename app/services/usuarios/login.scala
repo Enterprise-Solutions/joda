@@ -6,19 +6,22 @@ import scala.concurrent.{ExecutionContext,Future}
 import slick.driver.PostgresDriver
 import modelos.UsuarioT
 import modelos.LoginUser
+import modelos.Usuario
 import modelos.user_data
 import modelos.DatosLoginUser
 import java.sql.Date
 import play.api.libs.json._
-import services.jwt.authenticacionByJwt
+import services.jwt.TokenDB
 
 
-class Login @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
+class Login @Inject() (token: TokenDB, protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
   val usuarios = TableQuery[UsuarioT]
   
   def loginU(d: DatosLoginUser): Future[LoginUser] = {
-    db.run(loginUser(d).transactionally)
+    db.run(loginUser(d).transactionally).recover {
+      case e => LoginUser(true,Some("Usuario o contraseña incorrecta"),None,None,None, None) 
+    }
   }
          
    def loginUser(d: DatosLoginUser): DBIO[LoginUser] = {
@@ -31,18 +34,9 @@ class Login @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, i
        password = $password;
       """
      for{
-        r <- query.as[(String,String,String)]
-        r1 <- DBIO.successful{r.toSeq.headOption}
-        r2 <- DBIO.successful{
-          r1 match { case Some((uid,nombre,email)) =>//existe el usuario... CORRECTO!
-            // Aca deberia tirar el JWT.
-            val jwt = authenticacionByJwt.newToken(user, password, "secretKey")
-            LoginUser(false,None,Some(uid),Some(jwt),Some(user_data(nombre,email)))
-          case None =>
-            LoginUser(true,Some("Usuario o contraseña incorrecta"),None,None,None)
-          }
-        }
-     }yield(r2)
+        rOp <- query.as[(String,String,String)].headOption
+        (uid,nombre,email) <- DBIO.successful(rOp.getOrElse(throw new Exception("Usuario no valido!")))
+        jwt <- token.newToken(uid, user, password, "secretKey")        
+     }yield(LoginUser(false,None,Some(uid),Some(jwt),Some(user_data(nombre,email)), None))
   }
-  
 }
