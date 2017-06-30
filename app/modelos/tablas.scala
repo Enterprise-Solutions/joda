@@ -291,7 +291,8 @@ case class MarcacionR(
 //Login
 case class DatosLoginUser(
     usuario:String,
-    password:String
+    password:String,
+    fuente: String
 )
 
 //Login
@@ -299,26 +300,29 @@ case class DatosLogoutUser(
     usuario:String
 )
 
+//Payload del token válido
+case class DatosToken(
+  usuario: String,
+  uid: String,
+  rol: String,
+  timestamp: String,
+  fuente: String
+)
+
 object DatosLoginUser {
   val loginForm = Form(
         mapping(
     "usuario" -> text,
-    "password" -> text
+    "password" -> text,
+    "fuente" -> text
     )(DatosLoginUser.apply)(DatosLoginUser.unapply)
   )
   
     implicit val readsPerson: Reads[DatosLoginUser] = (
     ((__ \ "usuario").read[String]) and
-    ((__ \ "password").read[String])
+    ((__ \ "password").read[String]) and
+    ((__ \ "fuente").read[String])
   )(DatosLoginUser.apply _)  
-
-  implicit val writesItem = Writes[DatosLoginUser] {
-    case DatosLoginUser(usuario, password) =>
-      Json.obj(
-        "usuario" -> usuario,
-        "password" -> password
-      )
-  } 
 }
 
 object DatosLogoutUser {

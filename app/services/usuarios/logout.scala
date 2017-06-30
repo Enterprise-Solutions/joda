@@ -9,10 +9,10 @@ import modelos.LogoutUser
 import modelos.DatosLogoutUser
 import java.sql.Date
 import play.api.libs.json._
-import services.jwt.TokenDB
+import services.jwt.authenticacionByJwt
 
 
-class Logout @Inject() (token: TokenDB, protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
+class Logout @Inject() (jwt: authenticacionByJwt, protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
   val usuarios = TableQuery[UsuarioT]
   
@@ -32,7 +32,7 @@ class Logout @Inject() (token: TokenDB, protected val dbConfigProvider: Database
      for{
         rOp <- query.as[(String)].headOption
         (uid) <- DBIO.successful(rOp.getOrElse(throw new Exception("Usuario no valido!")))
-        jwt <- token.newToken(uid, user, "secretKey", "secretKey")            
+        jwtToken <- jwt.newToken(uid, user, "secretKey", "secretKey", "secretKey", "secretKey")            
      }yield(LogoutUser(false,None,Some("Sesión finalizada exitosamente")))
   }
 }

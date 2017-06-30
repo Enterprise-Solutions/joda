@@ -79,20 +79,23 @@ class Formatters {
     val loginForm = Form(
           mapping(
       "usuario" -> text,
-      "password" -> text
+      "password" -> text,
+      "fuente" -> text
       )(DatosLoginUser.apply)(DatosLoginUser.unapply)
     )
     
     implicit val readsPerson: Reads[DatosLoginUser] = (
       ((__ \ "usuario").read[String]) and
-      ((__ \ "password").read[String])
+      ((__ \ "password").read[String]) and
+      ((__ \ "fuente").read[String])
     )(DatosLoginUser.apply _)  
   
     implicit val writesItem = Writes[DatosLoginUser] {
-      case DatosLoginUser(usuario, password) =>
+      case DatosLoginUser(usuario, password, fuente) =>
         Json.obj(
           "usuario" -> usuario,
-          "password" -> password
+          "password" -> password,
+          "fuente" -> fuente
         )
     }
   }

@@ -20,7 +20,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import services.jwt.TokenDB
+import services.jwt.authenticacionByJwt
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -28,7 +28,7 @@ import services.jwt.TokenDB
 
 @Singleton
 @Api(value = "Usuarios", description = "Operations about Users", consumes="application/x-www-form-urlencoded")
-class UsuariosController @Inject() (tokenU: TokenDB, logoutU: Logout, editContrasenha: EditarContrasenha, editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
+class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, editContrasenha: EditarContrasenha, editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
   
   val HEADER_STRING = "Authorization"
   val error_token = "Token incorrecto o caducado. Volver a autenticarse"
@@ -95,7 +95,7 @@ class UsuariosController @Inject() (tokenU: TokenDB, logoutU: Logout, editContra
    val message = "Something go wrong !"
    val token = request.headers.get(HEADER_STRING).getOrElse("")
    for{
-     v <- tokenU.esValido(token, "secretKey")
+     v <- jwt.esValido(token, "secretKey")
      f <- v match{
        case true =>  DatosLogoutUser.logoutForm.bindFromRequest().fold(
           formWithErrors => {

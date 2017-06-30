@@ -16,6 +16,7 @@ import io.swagger.annotations._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import services.jwt.authenticacionByJwt
 
 
 /**
@@ -25,8 +26,10 @@ import scala.concurrent.Future
 
 @Singleton
 @Api(value = "Marcaciones", description = "Operaciones con las marcaciones", consumes="application/x-www-form-urlencoded") 
-class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,listarMarcacionPorLugares: marcacionesDeLugares, nueva_marcacion: insertarMarcacion,implicit val ec: ExecutionContext) extends Controller {
+class MarcacionesControllers @Inject() (jwt: authenticacionByJwt, enlistarMarcaciones:listarMarcaciones,listarMarcacionPorLugares: marcacionesDeLugares, nueva_marcacion: insertarMarcacion,implicit val ec: ExecutionContext) extends Controller {
   
+  val HEADER_STRING = "Authorization"
+  val error_token = "Token incorrecto o caducado. Volver a autenticarse"
   implicit val crearMarcacionJsonFormatter = Json.format[crearMarcacion]
   implicit val datoslugaresmarcacionesJsonFormatter= Json.format[DatosLugaresMarcaciones]
   implicit val lugarJsonFormatter = Json.format[Lugar]
@@ -185,11 +188,29 @@ class MarcacionesControllers @Inject() (enlistarMarcaciones:listarMarcaciones,li
      response = classOf[modelos.listadoMarcaciones],
      httpMethod = "GET")
    def listarMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) = Action.async{request =>
-     enlistarMarcaciones.mostrarMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) map { r =>
-       Ok(Json.toJson(r))
-     } recover {
-      case e: Exception => BadRequest(e.getMessage)
-    }
+     val token = request.headers.get(HEADER_STRING).getOrElse("")
+     for {
+       f <- jwt.esValido(token, "secretKey") 
+       r <- f match {
+         case true =>
+           val dt = jwt.decodificarToken(token)
+           println(dt.usuario + " " + dt.rol + " " + dt.fuente)
+           (dt.fuente, dt.rol) match{
+             case ("W", "admin") => enlistarMarcaciones.mostrarMarcaciones(usuario, fecha, lugar_id, cliente_id) map { r =>
+                   println(s"es admin")
+                   Ok(Json.toJson(r))
+                 } recover {
+                  case e: Exception => BadRequest(e.getMessage)        
+                 }
+             case _ => enlistarMarcaciones.mostrarMarcaciones(Some(dt.usuario), fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) map { r =>
+                 Ok(Json.toJson(r))
+               } recover {
+                case e: Exception => BadRequest(e.getMessage)
+               }
+            }
+         case _ => Future(BadRequest(error_token))
+      }
+    }yield(r)
    }  
 
 }

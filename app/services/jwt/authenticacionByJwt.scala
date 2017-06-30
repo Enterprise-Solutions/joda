@@ -8,26 +8,17 @@ import java.text.SimpleDateFormat
 import modelos.UsuarioT
 import play.api.db.slick.{DatabaseConfigProvider,HasDatabaseConfigProvider}
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import javax.inject.{Inject,Named}
 import scala.concurrent.{ExecutionContext,Future}
+import scala.util.Success
+import scala.util.Failure
+import scala.util.Try
 import slick.driver.PostgresDriver
 import java.sql.Date
+import modelos.DatosToken
 
-/*object authenticacionByJwt extends App {
- 
-  def esValido(token:String, key:String):Boolean = {
-    Jwt.isValid(token, key, Seq(JwtAlgorithm.HS256))
-  }
-  
-  def newToken(uid: String, user:String,password:String, key:String):String = {
-    val formatOfTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-    val now = (Calendar.getInstance().getTime()).getTime()
-    val nowTimestamp = new Timestamp(now)
-    Jwt.encode(s"""{"user":$user,"password":$password, "Timestamp":$nowTimestamp}""",key, JwtAlgorithm.HS256)
-  } 
-}*/
-
-class TokenDB @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
+class authenticacionByJwt @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
   val usuarios = TableQuery[UsuarioT]
   
@@ -41,11 +32,11 @@ class TokenDB @Inject() (protected val dbConfigProvider: DatabaseConfigProvider,
     }yield(r))
   }
   
-  def newToken(uid: String, user:String,password:String, key:String): DBIO[String] = {
+  def newToken(uid: String, user:String,password:String, rol:String, fuente:String, key:String): DBIO[String] = {
     val formatOfTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val now = (Calendar.getInstance().getTime()).getTime()
     val nowTimestamp = new Timestamp(now)
-    val jwt = Jwt.encode(s"""{"user":$user,"password":$password, "Timestamp":$nowTimestamp}""",key, JwtAlgorithm.HS256)
+    val jwt = Jwt.encode(s"""{"usuario":"joaquin","uid":"$uid","rol":"$rol","timestamp":"$nowTimestamp", "fuente":"$fuente"}""",key, JwtAlgorithm.HS256)
     for {
      _ <- insertToken(uid,jwt) 
     }yield(jwt)
@@ -72,4 +63,33 @@ class TokenDB @Inject() (protected val dbConfigProvider: DatabaseConfigProvider,
         }
       }yield(b)
   } 
+   
+   implicit val locationReads: Reads[DatosToken] = (
+    (__ \ "usuario").read[String] and
+    (JsPath \ "uid").read[String] and
+    (JsPath \ "rol").read[String] and
+    (JsPath \ "timestamp").read[String] and
+    (JsPath \ "fuente").read[String]
+    )(DatosToken.apply _)
+   
+  def decodificarToken(token: String): DatosToken = {
+    /*Decodifica en Try[(String, String, String)] toda la estructura del token
+    val t = Jwt.decodeRawAll(token, "secretKey", JwtAlgorithm.allHmac)*/
+    
+    //Solo decodifica el payload
+    val payload = Jwt.decode(token, "secretKey", JwtAlgorithm.allHmac).get
+    val json: JsValue = Json.parse(payload)
+    
+    /*val usuario = (json \ "usuario").get.toString()
+    println(s"valor de usuario: $usuario")
+    val uid = (json \ "uid").get.toString()
+    val rol = (json \ "rol").get.toString()
+    val timestamp = (json \ "timestamp").get.toString()
+    val fuente = (json \ "fuente").get.toString()*/
+    
+    val datosTokenResult: DatosToken = json.as[DatosToken]
+    datosTokenResult
+    
+  } 
+   
 }
