@@ -28,8 +28,8 @@ import services.jwt.authenticacionByJwt
 @Api(value = "Marcaciones", description = "Operaciones con las marcaciones", consumes="application/x-www-form-urlencoded") 
 class MarcacionesControllers @Inject() (jwt: authenticacionByJwt, enlistarMarcaciones:listarMarcaciones,listarMarcacionPorLugares: marcacionesDeLugares, nueva_marcacion: insertarMarcacion,implicit val ec: ExecutionContext) extends Controller {
   
-  val HEADER_STRING = "Authorization"
-  val error_token = "Token incorrecto o caducado. Volver a autenticarse"
+  val authentication = new controllers.Authentication(jwt,ec)
+  
   implicit val crearMarcacionJsonFormatter = Json.format[crearMarcacion]
   implicit val datoslugaresmarcacionesJsonFormatter= Json.format[DatosLugaresMarcaciones]
   implicit val lugarJsonFormatter = Json.format[Lugar]
@@ -116,7 +116,7 @@ class MarcacionesControllers @Inject() (jwt: authenticacionByJwt, enlistarMarcac
         dataType = "string",
         paramType = "query")
   ))
-  def marcacionesLugares() = Action.async { implicit request =>
+  def marcacionesLugares() = authentication.LoggingAction { implicit request =>
     val message = "Something go wrong !"
     Formulario.marcacionesUsuarioForm.bindFromRequest().fold(
          formWithErrors => {
@@ -168,7 +168,7 @@ class MarcacionesControllers @Inject() (jwt: authenticacionByJwt, enlistarMarcac
         dataType = "double",
         paramType = "query")
   ))
-    def crearNuevaMarcacion() = Action.async { implicit request =>
+    def crearNuevaMarcacion() = authentication.LoggingAction{ implicit request =>
     val message = "Something go wrong !"
     DatosCrearMarcacion.crearMarcacionForm.bindFromRequest().fold(
          formWithErrors => {
@@ -187,15 +187,11 @@ class MarcacionesControllers @Inject() (jwt: authenticacionByJwt, enlistarMarcac
      notes = "Enlista marcaciones con posibilidades de filtros como el Usuario,Lugar, Fecha, y entre horas de entrada o salida",
      response = classOf[modelos.listadoMarcaciones],
      httpMethod = "GET")
-   def listarMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) = Action.async{request =>
-     val token = request.headers.get(HEADER_STRING).getOrElse("")
+   def listarMarcaciones(usuario: Option[String], fecha: Option[String],lugar_id: Option[Long],cliente_id: Option[Long]) = authentication.LoggingAction{request =>
+     val token = authentication.returnToken(request)
+     val dt = jwt.decodificarToken(token)
      for {
-       f <- jwt.esValido(token, "secretKey") 
-       r <- f match {
-         case true =>
-           val dt = jwt.decodificarToken(token)
-           println(dt.usuario + " " + dt.rol + " " + dt.fuente)
-           (dt.fuente, dt.rol) match{
+        r <- (dt.fuente, dt.rol) match{
              case ("W", "admin") => enlistarMarcaciones.mostrarMarcaciones(usuario, fecha, lugar_id, cliente_id) map { r =>
                    println(s"es admin")
                    Ok(Json.toJson(r))
@@ -208,8 +204,6 @@ class MarcacionesControllers @Inject() (jwt: authenticacionByJwt, enlistarMarcac
                 case e: Exception => BadRequest(e.getMessage)
                }
             }
-         case _ => Future(BadRequest(error_token))
-      }
     }yield(r)
    }  
 

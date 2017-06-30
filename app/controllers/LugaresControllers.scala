@@ -31,7 +31,7 @@ class LugaresControllers @Inject() (jwt: authenticacionByJwt, editar: EditarLuga
   implicit val listadoLugaresFormatter = Json.format[listadoLugares]
   implicit val crearLugarFormatter = Json.format[nuevoLugar]
   implicit val editarLugarFormatter = Json.format[edicionLugar]
-  val HEADER_STRING = "Authorization"
+  val authentication = new controllers.Authentication(jwt,ec)
 
   implicit val lugarRWJsonFormatter: Writes[LugarR] = (
     (JsPath \ "id").write[Long] and
@@ -62,21 +62,12 @@ class LugaresControllers @Inject() (jwt: authenticacionByJwt, editar: EditarLuga
      notes = "Muestra todos los lugares",
      response = classOf[modelos.listadoLugares],
      httpMethod = "GET")
-  def listarLugares(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String]) = Action.async{request =>
-     val token = request.headers.get(HEADER_STRING).getOrElse("")
-     
-     for {
-       f <- jwt.esValido(token, "secretKey") 
-       r <- f match {
-         case true =>      
-           listarlugares.mostrarLugares(busqueda, pagina, cantidad, ordenarPor, direccionOrd) map { r =>
-             Ok(Json.toJson(r))
-           } recover {
-            case e: Exception => BadRequest(e.getMessage)
-          }
-         case _ => Future(BadRequest("WRONG TOKEN!"))
-       }
-     }yield(r)
+  def listarLugares(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String]) = authentication.LoggingAction{request =>     
+       listarlugares.mostrarLugares(busqueda, pagina, cantidad, ordenarPor, direccionOrd) map { r =>
+           Ok(Json.toJson(r))
+        } recover {
+          case e: Exception => BadRequest(e.getMessage)
+        }
    }  
 
   @ApiOperation(value = "crearLugar",
@@ -121,7 +112,7 @@ class LugaresControllers @Inject() (jwt: authenticacionByJwt, editar: EditarLuga
         dataType = "int",
         paramType = "query")
   ))
-  def crearLugar() = Action.async { implicit request =>
+  def crearLugar() = authentication.LoggingAction{ implicit request =>
    val message = "Something go wrong !"
    DatosNuevoLugar.datosNuevoLugarForm.bindFromRequest().fold(
       formWithErrors => {

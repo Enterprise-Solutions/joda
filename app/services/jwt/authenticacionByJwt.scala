@@ -1,6 +1,7 @@
 package services.jwt
 
 import io.really.jwt._
+import play.api._
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtHeader, JwtClaim, JwtOptions}
 import java.util.Calendar
 import java.sql.Timestamp
@@ -11,9 +12,6 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import javax.inject.{Inject,Named}
 import scala.concurrent.{ExecutionContext,Future}
-import scala.util.Success
-import scala.util.Failure
-import scala.util.Try
 import slick.driver.PostgresDriver
 import java.sql.Date
 import modelos.DatosToken
@@ -21,7 +19,6 @@ import modelos.DatosToken
 class authenticacionByJwt @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, implicit val ec: ExecutionContext) extends HasDatabaseConfigProvider[PostgresDriver] {
   import driver.api._
   val usuarios = TableQuery[UsuarioT]
-  
   def esValido(token:String, key:String): Future[Boolean] = {
     db.run(for {
       j <- DBIO.successful(Jwt.isValid(token, key, Seq(JwtAlgorithm.HS256)))
@@ -93,3 +90,5 @@ class authenticacionByJwt @Inject() (protected val dbConfigProvider: DatabaseCon
   } 
    
 }
+
+

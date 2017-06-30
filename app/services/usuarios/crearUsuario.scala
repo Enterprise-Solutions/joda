@@ -28,7 +28,7 @@ class CrearUsuario @Inject() (protected val dbConfigProvider: DatabaseConfigProv
     }
         
     def _insertarNuevoUsuario(d: DatosNuevoUsuario): DBIO[Usuario] = {
-    val u = Usuario(0,d.nombre, d.apellido,d.documento,Some(d.email), d.usuario, d.password, "1", d.activo, d.web_login,d.empresa_id,null)
+    val u = Usuario(0,d.nombre, d.apellido,d.documento,Some(d.email), d.usuario, d.password, "1", d.activo, d.web_login,d.empresa_id,null,d.rol)
     for{
       new_id <- usuarios returning usuarios.map(_.id_usuario) += u
       u1  <- new_id match{

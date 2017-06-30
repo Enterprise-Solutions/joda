@@ -29,7 +29,7 @@ POST	/marcar						controllers.MarcacionesControllers.crearNuevaMarcacion()
 
 GET   /docs/                   		controllers.Application.redirectDocs
 
-# Swagger API
+# Swagger API(Documentation)
 GET   /swagger.json                 controllers.ApiHelpController.getResources
 
 # Map static resources from the /public folder to the /assets URL path

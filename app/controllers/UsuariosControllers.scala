@@ -30,8 +30,8 @@ import services.jwt.authenticacionByJwt
 @Api(value = "Usuarios", description = "Operations about Users", consumes="application/x-www-form-urlencoded")
 class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, editContrasenha: EditarContrasenha, editar: EditarUsuario, nuevoUsuario: CrearUsuario, listarUsuarios: Listar, login: Login, implicit val ec: ExecutionContext) extends Controller {
   
-  val HEADER_STRING = "Authorization"
-  val error_token = "Token incorrecto o caducado. Volver a autenticarse"
+  val authentication = new controllers.Authentication(jwt,ec)
+  
   implicit val userdataJsonFormatter = Json.format[user_data]
   implicit val usuariologinJsonFormatter = Json.format[LoginUser]
   implicit val usuariologoutJsonFormatter = Json.format[LogoutUser]
@@ -44,6 +44,7 @@ class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, e
   implicit val editarUsuarioJsonFormatter = Json.format[edicionUsuario]
   implicit val datosEditarContrasenhaJsonFormatter = Json.format[DatosEditarContrasenha]
   implicit val editarContrasenhaJsonFormatter = Json.format[edicionContrasenha]
+  
   
   @ApiOperation(value = "loginUser",
      notes = "Permite Loguear un Usuario",
@@ -59,6 +60,12 @@ class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, e
       new ApiImplicitParam(
         name = "password",
         value = "The Password",
+        required = true,
+        dataType = "string",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "fuente",
+        value = "Could be Web or Mobile",
         required = true,
         dataType = "string",
         paramType = "query")
@@ -91,35 +98,27 @@ class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, e
         dataType = "string",
         paramType = "query")
   ))
-  def logoutUser() = Action.async { implicit request =>
+  def logoutUser() = authentication.LoggingAction{ implicit request =>
    val message = "Something go wrong !"
-   val token = request.headers.get(HEADER_STRING).getOrElse("")
-   for{
-     v <- jwt.esValido(token, "secretKey")
-     f <- v match{
-       case true =>  DatosLogoutUser.logoutForm.bindFromRequest().fold(
-          formWithErrors => {
-            Future.successful(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
-           },
-           d => {
-             logoutU.logoutU(d) map{ u =>
-               Ok(Json.toJson(u))
-             }recover {
-              case e: Exception => BadRequest(e.getMessage)
-             }
-           }
-         )
-       case _ => Future(BadRequest(error_token))
+   DatosLogoutUser.logoutForm.bindFromRequest().fold(
+     formWithErrors => {
+       Future(BadRequest(Json.obj("status" ->"Error", "message" -> message)))
+     },
+     d => {
+       logoutU.logoutU(d) map{ u =>
+         Ok(Json.toJson(u))
+       }recover{
+         case e: Exception => BadRequest(e.getMessage)
+       }
      }
-   }yield(f)
+   )
  }
        
-  
   @ApiOperation(value = "listar",
      notes = "Genera una lista de los usuarios segun una busqueda ",
      response = classOf[modelos.listadoUsuarios],
      httpMethod = "GET")
-  def listar(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String]) = Action.async{request =>
+  def listar(busqueda: Option[String], pagina: Option[Int], cantidad: Option[Int], ordenarPor: Option[String], direccionOrd: Option[String]) = authentication.LoggingAction{request =>
      listarUsuarios.listar(busqueda, pagina, cantidad, ordenarPor, direccionOrd) map { r =>
        Ok(Json.toJson(r))
      } recover {
@@ -179,11 +178,17 @@ class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, e
         value = "Can Loggin from web?",
         required = true,
         dataType = "boolean",
+        paramType = "query"),
+      new ApiImplicitParam(
+        name = "Rol",
+        value = "Es un usuario o un admin?",
+        required = true,
+        dataType = "string",
         paramType = "query")
   ))
   @ApiResponses(Array(new ApiResponse(code = 400, message = "Invalid ID supplied",response = classOf[modelos.nuevoUsuario]),
-      new ApiResponse(code = 404, message = "Pet not found",  response = classOf[modelos.nuevoUsuarioNoencontrado])))
-  def crearUsuario() = Action.async { implicit request =>
+      new ApiResponse(code = 404, message = "User not found",  response = classOf[modelos.nuevoUsuarioNoencontrado])))
+  def crearUsuario() = authentication.LoggingAction{ implicit request =>
    val message = "Something go wrong !"
    DatosNuevoUsuario.datosNuevoUsuarioForm.bindFromRequest().fold(
       formWithErrors => {
@@ -252,7 +257,7 @@ class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, e
         dataType = "boolean",
         paramType = "query")
   ))
-  def editarUsuario() = Action.async { implicit request =>
+  def editarUsuario() = authentication.LoggingAction{ implicit request =>
    val message = "Something go wrong !"
    DatosEditarUsuario.datosEditarUsuarioForm.bindFromRequest().fold(
       formWithErrors => {
@@ -298,7 +303,7 @@ class UsuariosController @Inject() (jwt: authenticacionByJwt, logoutU: Logout, e
         dataType = "string",
         paramType = "query")
   ))
-  def editarContrasenha() = Action.async { implicit request =>
+  def editarContrasenha() = authentication.LoggingAction{ implicit request =>
    val message = "Something go wrong !"
    DatosEditarContrasenha.datosEditarContrasenhaForm.bindFromRequest().fold(
       formWithErrors => {

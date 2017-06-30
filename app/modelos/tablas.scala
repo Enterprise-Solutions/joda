@@ -33,7 +33,8 @@ case class Usuario(
  activo:Boolean,
  web_login:Boolean,
  id_empresa:Long,
- token: Option[String]
+ token: Option[String],
+ rol: String
 )
 class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
   def id_usuario = column[Long]("id_usuario",O.PrimaryKey,O.AutoInc)
@@ -48,8 +49,9 @@ class UsuarioT (tag: Tag) extends Table[Usuario](tag,"usuarios"){
   def web_login = column[Boolean]("web_login")
   def id_empresa = column[Long]("id_empresa")
   def token = column[Option[String]]("token")
+  def rol = column[String]("rol")
   
-  def * = (id_usuario,nombre,apellido,documento,email,usuario,password,uid,activo,web_login,id_empresa,token) <> (Usuario.tupled,Usuario.unapply)
+  def * = (id_usuario,nombre,apellido,documento,email,usuario,password,uid,activo,web_login,id_empresa,token,rol) <> (Usuario.tupled,Usuario.unapply)
 }
 
 case class Cliente(
@@ -168,7 +170,8 @@ case class DatosNuevoUsuario(
  password: String,
  activo:Boolean,
  web_login:Boolean,
- empresa_id:Int
+ empresa_id:Int,
+ rol: String
 )
 
 
@@ -351,7 +354,8 @@ object DatosNuevoUsuario {
     "password" -> text,
     "activo" -> boolean,
     "web_login" -> boolean,
-    "empresa_id" -> number
+    "empresa_id" -> number,
+    "rol" -> text
     )(DatosNuevoUsuario.apply)(DatosNuevoUsuario.unapply)
   )
   
@@ -364,11 +368,12 @@ object DatosNuevoUsuario {
     ((__ \ "password").read[String]) and
     ((__ \ "activo").read[Boolean]) and
     ((__ \ "web_login").read[Boolean]) and
-    ((__ \ "empresa_id").read[Int])
+    ((__ \ "empresa_id").read[Int])and 
+    ((__ \ "rol").read[String])
   )(DatosNuevoUsuario.apply _)  
 
   implicit val writesItem = Writes[DatosNuevoUsuario] {
-    case DatosNuevoUsuario(nombre, apellido, documento, email, usuario, password, activo, web_login,empresa_id) =>
+    case DatosNuevoUsuario(nombre, apellido, documento, email, usuario, password, activo, web_login,empresa_id,rol) =>
       Json.obj(
         "nombre" -> nombre,
         "apellido" -> apellido,
@@ -378,7 +383,8 @@ object DatosNuevoUsuario {
         "password" -> password,
         "activo" -> activo,
         "web_login" -> web_login,
-        "empresa_id" -> empresa_id
+        "empresa_id" -> empresa_id,
+        "rol" -> rol
       )
   }
 }
